@@ -14,7 +14,7 @@ class HelloController extends Controller
         $archiveTxt = new ArchiveTxt();
         $archiveUrls = $archiveTxt->parse('/home/vlad/work_data/healthlifemag/medical_articles.txt');
 
-        print_r($archiveUrls);
+        //print_r($archiveUrls);
 
 
         /**
@@ -24,7 +24,10 @@ class HelloController extends Controller
         foreach ($archiveUrls as $archiveUrl){
             if(!isset($parsers[$archiveUrl->parserClass])){
                 try{
-                    $parsers[$archiveUrl->parserClass] = new $archiveUrl->parserClass();
+                    if(class_exists($archiveUrl->parserClass)){
+                        $parsers[$archiveUrl->parserClass] = new $archiveUrl->parserClass();
+                    }
+
                 }
                 catch (\Exception $exception){
                     echo $archiveUrl->parserClass . ' class not exists' . PHP_EOL;
@@ -33,10 +36,12 @@ class HelloController extends Controller
             }
 
             if(isset($parsers[$archiveUrl->parserClass])){
+                echo $archiveUrl->parseUrl . PHP_EOL;
                 $parsers[$archiveUrl->parserClass]->parseArticle($archiveUrl->parseUrl, $archiveUrl->url);
+               // break;
             }
 
         }
-        print_r($parsers);
+
     }
 }

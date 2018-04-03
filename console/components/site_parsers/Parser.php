@@ -23,9 +23,18 @@ use GuzzleHttp\Client; // подключаем Guzzle
         $content = $document->find($this->contentSelector);
         $title = $document->find($this->titleSelector);
 
+        if($content){
+            $srcPath = $this->getSrcPath($url);
+            $this->saveSrc($srcPath, $body);
+        }
 
-        $content = $title->html() . PHP_EOL . PHP_EOL . $content->html();
+
+        //var_dump($title);
+      //  die();
+
+        $title = $this->replace($title);
         $content = $this->replace($content);
+        $content = $title . PHP_EOL . PHP_EOL . $content;
         $this->saveDst($url, $content);
     }
 
@@ -37,18 +46,18 @@ use GuzzleHttp\Client; // подключаем Guzzle
 
         $client = new Client();
 
-        //$client->request('GET', $parseUrl, [
-          //  'headers' => [
-            //    'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36',
-              //  'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            //]
-        //]);
+        $res =$client->request('GET', $parseUrl, [
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36',
+                'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            ]
+        ]);
 
         //$res = $client->request('GET', $parseUrl);
-        //$body = $res->getBody();
-        $body = '111sasa';
+        $body = $res->getBody();
+        //$body = '111sasa';
 
-        $this->saveSrc($srcPath, $body);
+
         return $body;
     }
 
@@ -88,7 +97,13 @@ use GuzzleHttp\Client; // подключаем Guzzle
         file_put_contents($srcPath, $body);
     }
 
-    protected function replace($body){
+    protected function replace(\phpQueryObject $body){
+        $activeObjects = $body->find('script,iframe,frame,img');
+        foreach ($activeObjects as $elem) {
+            $pq = pq($elem);
+            $pq->remove();
+        }
+        $body = $body->html();
         return preg_replace('|<a[^>]+>([^>]+)</a>|', '$1', $body);
     }
 }

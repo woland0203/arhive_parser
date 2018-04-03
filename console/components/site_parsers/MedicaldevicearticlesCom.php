@@ -5,9 +5,9 @@ use GuzzleHttp\Client; // подключаем Guzzle
 
 class MedicaldevicearticlesCom extends Parser
 {
-    const DOMAIN = 'medicalnews-articles.com';
-    public $contentSelector = '#content .entry';
-    public $titleSelector = '#content .post_top .post_title h2 a';
+  //  const DOMAIN = 'medicalnews-articles.com';
+    public $contentSelector = '#im-mainContent .entry';
+    public $titleSelector = '.post h1';
 
 
 }

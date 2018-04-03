@@ -6,8 +6,8 @@ use GuzzleHttp\Client; // подключаем Guzzle
 class MedicalproductsnewsarticlesCom extends Parser
 {
     const DOMAIN = 'medicalnews-articles.com';
-    public $contentSelector = '#content .entry';
-    public $titleSelector = '#content .post_top .post_title h2 a';
+    public $contentSelector = '#outline_box .box_content_standard';
+    public $titleSelector = '#outline_box > div > span.page_pr_title_red';
 
 
 }
