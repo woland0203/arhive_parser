@@ -4,7 +4,7 @@ namespace console\components\site_parsers;
 use GuzzleHttp\Client; // подключаем Guzzle
 
  class Parser{
-    const PATH = '/home/vlad/work_data/healthlifemag/tmp';
+    const PATH = '/home/vkarpenko/work_data/project/healthlifemag/parsed';
 
    // abstract public function parseArticle($parseUrl, $url);
    // abstract protected function getDomain();
@@ -18,16 +18,13 @@ use GuzzleHttp\Client; // подключаем Guzzle
 
         $body = $this->parseExec($parseUrl,$url);
 
+        $srcPath = $this->getSrcPath($url);
+        $this->saveSrc($srcPath, $body);
+
 
         $document = \phpQuery::newDocumentHTML($body);
-        $content = $document->find($this->contentSelector);
-        $title = $document->find($this->titleSelector);
-
-        if($content){
-            $srcPath = $this->getSrcPath($url);
-            $this->saveSrc($srcPath, $body);
-        }
-
+        $content = $this->findContent($document);
+        $title = $this->findTitle($document);
 
         //var_dump($title);
       //  die();
@@ -37,6 +34,14 @@ use GuzzleHttp\Client; // подключаем Guzzle
         $content = $title . PHP_EOL . PHP_EOL . $content;
         $this->saveDst($url, $content);
     }
+
+     protected function findContent($document){
+        return $document->find($this->contentSelector);
+     }
+
+     protected function findTitle($document){
+         return $document->find($this->titleSelector);
+     }
 
     protected function parseExec($parseUrl, $url, $force = false){
         $srcPath = $this->getSrcPath($url);
@@ -98,7 +103,7 @@ use GuzzleHttp\Client; // подключаем Guzzle
     }
 
     protected function replace(\phpQueryObject $body){
-        $activeObjects = $body->find('script,iframe,frame,img');
+        $activeObjects = $body->find('script,iframe,frame');
         foreach ($activeObjects as $elem) {
             $pq = pq($elem);
             $pq->remove();

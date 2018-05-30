@@ -12,7 +12,8 @@ class HelloController extends Controller
 {
     public function actionIndex(){
         $archiveTxt = new ArchiveTxt();
-        $archiveUrls = $archiveTxt->parse('/home/vlad/work_data/healthlifemag/medical_articles.txt');
+        //$archiveUrls = $archiveTxt->parse('/home/vlad/work_data/healthlifemag/medical_articles.txt');
+        $archiveUrls = $archiveTxt->parseInline('/home/vkarpenko/tmp/tmp2/test.txt');
 
         //print_r($archiveUrls);
 
@@ -37,7 +38,11 @@ class HelloController extends Controller
 
             if(isset($parsers[$archiveUrl->parserClass])){
                 echo $archiveUrl->parseUrl . PHP_EOL;
-                $parsers[$archiveUrl->parserClass]->parseArticle($archiveUrl->parseUrl, $archiveUrl->url);
+             //   try {
+                    $parsers[$archiveUrl->parserClass]->parseArticle($archiveUrl->parseUrl, $archiveUrl->url);
+               // }catch (\Exception $exception){
+                        echo ' Parser Error(404)' . PHP_EOL;
+                 //   }
                // break;
             }
 
