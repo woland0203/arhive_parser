@@ -6,7 +6,7 @@ use yii\console\Controller;
 use console\components\site_parsers\Parser;
 use console\components\file_parsers\ArchiveTxt;
 use console\components\file_parsers\ArchiveUrl;
-
+use console\components\loader\WpLoader;
 
 class HelloController extends Controller
 {
@@ -48,5 +48,10 @@ class HelloController extends Controller
 
         }
 
+    }
+
+    public function actionPost(){
+        $loader = new WpLoader();
+        $loader->loadPost();
     }
 }

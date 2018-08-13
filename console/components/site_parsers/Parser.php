@@ -24,15 +24,20 @@ use GuzzleHttp\Client; // подключаем Guzzle
 
 
         $document = \phpQuery::newDocumentHTML($body);
-        $content = $this->findContent($document);
         $title = $this->findTitle($document);
+        $title = $this->replace($title);
+
+        echo $title . PHP_EOL;
+
+        $content = $this->findContent($document);
+
 
         //var_dump($title);
       //  die();
 
-        $title = $this->replace($title);
+
         $content = $this->replace($content);
-        $content = $title . PHP_EOL . PHP_EOL . $content;
+        $content = $title . PHP_EOL . PHP_EOL . '<br><br>' . PHP_EOL . $content;
         $this->saveDst($url, $content);
     }
 

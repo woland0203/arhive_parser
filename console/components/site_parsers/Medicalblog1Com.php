@@ -3,7 +3,7 @@ namespace console\components\site_parsers;
 
 
 
-class HealthlifepsychologyNet extends Parser
+class Medicalblog1Com extends Parser
 {
     const DOMAIN = 'medicalnews-articles.com';
     public $contentSelector = '.entry';

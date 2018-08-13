@@ -30,6 +30,12 @@ return [
                 ],
             ],
         ],
+        'blog' => [
+            'class' => '\monitorbacklinks\yii2wp\Wordpress',
+            'endpoint' => 'https://healthlifemag.com/xmlrpc.php',
+            'username' => 'healthy',
+            'password' => 'guiTRUSt9-11'
+        ]
     ],
     'params' => $params,
 ];
