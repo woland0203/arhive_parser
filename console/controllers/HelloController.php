@@ -52,6 +52,6 @@ class HelloController extends Controller
 
     public function actionPost(){
         $loader = new WpLoader();
-        $loader->loadPost();
+        $loader->loadFromFolder('/home/vlad/Загрузки/add_this/tt');
     }
 }
