@@ -57,8 +57,12 @@ class WpLoader{
 
     public function prepareContent($title){
         $title = $this->rip_tags($title, '<li><ul><ol><b><i><u>');
-        $title = preg_replace('|\n+|', PHP_EOL, $title);
-       // remove not utf 8
+
+
+        $text['content'] = preg_replace('/^[^\w]+/', '', $text['content']);
+        $text['content'] = preg_replace('/[\x00-\x09\x0B-\x1F\x7F-\xFF]/', '', $text['content']); //7 bit ASCII
+        $text['content'] = preg_replace('|\x0A{2,}|', PHP_EOL . PHP_EOL, $text['content']);
+
         return trim($title);
     }
 
