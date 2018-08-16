@@ -23,9 +23,9 @@ class WpLoader{
         while (false !== ($entry = $d->read())) {
             if(is_file($d->path . DIRECTORY_SEPARATOR . $entry)){
                 $post = $this->createPostFromFile($d->path . DIRECTORY_SEPARATOR . $entry);
-           //    if( ($added = $this->loadPost($post)) ){
-             //      echo 'Added: ' . $added . PHP_EOL;
-               //}
+               if( ($added = $this->loadPost($post)) ){
+                   echo 'Added: ' . $added . PHP_EOL;
+               }
             }
         }
         $d->close();
@@ -39,7 +39,7 @@ class WpLoader{
         unset($matces[0]);
         $content = implode((PHP_EOL . PHP_EOL), $matces);
         $content = $this->prepareContent($content);
-        echo $content;
+        //echo $content;
 
         //echo implode((PHP_EOL . PHP_EOL), $matces);
         return [
@@ -59,9 +59,9 @@ class WpLoader{
         $title = $this->rip_tags($title, '<li><ul><ol><b><i><u>');
 
 
-        $text['content'] = preg_replace('/^[^\w]+/', '', $text['content']);
-        $text['content'] = preg_replace('/[\x00-\x09\x0B-\x1F\x7F-\xFF]/', '', $text['content']); //7 bit ASCII
-        $text['content'] = preg_replace('|\x0A{2,}|', PHP_EOL . PHP_EOL, $text['content']);
+        $title = preg_replace('/^[^\w]+/', '', $title);
+        $title = preg_replace('/[\x00-\x09\x0B-\x1F\x7F-\xFF]/', '', $title); //7 bit ASCII
+        $title = preg_replace('|\x0A{2,}|', PHP_EOL . PHP_EOL,$title);
 
         return trim($title);
     }
