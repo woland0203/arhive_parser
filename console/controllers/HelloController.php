@@ -12,8 +12,8 @@ class HelloController extends Controller
 {
     public function actionIndex(){
         $archiveTxt = new ArchiveTxt();
-        $archiveUrls = $archiveTxt->parseInline('/home/vlad/work_data/healthlifemag/medical_articles.txt');
-        //$archiveUrls = $archiveTxt->parseInline('/home/vkarpenko/tmp/tmp2/test.txt');
+        //$archiveUrls = $archiveTxt->parse('/home/vlad/work_data/healthlifemag/medical_articles.txt');
+        $archiveUrls = $archiveTxt->parseInline('/home/vkarpenko/work_data/project/healthlifemag/test.txt');
 
         //print_r($archiveUrls);
 
@@ -38,11 +38,11 @@ class HelloController extends Controller
 
             if(isset($parsers[$archiveUrl->parserClass])){
                 echo $archiveUrl->parseUrl . PHP_EOL;
-               try {
+                try {
                     $parsers[$archiveUrl->parserClass]->parseArticle($archiveUrl->parseUrl, $archiveUrl->url);
                 }catch (\Exception $exception){
-                        echo ' Parser Error(404)' . PHP_EOL;
-                   }
+                        echo  'EXCEPT-PARSER ' . $exception->getMessage() . '' . PHP_EOL;
+                    }
                // break;
             }
 
@@ -53,5 +53,10 @@ class HelloController extends Controller
     public function actionPost(){
         $loader = new WpLoader();
         $loader->loadFromFolder('/home/vlad/Загрузки/add_this/tt');
+    }
+
+    public function actionTranslate(){
+        $Translator = new \console\components\translator\Translator();
+        $Translator->translateHtml( file_get_contents('/home/vkarpenko/tmp/tmp2/tt.html') );
     }
 }

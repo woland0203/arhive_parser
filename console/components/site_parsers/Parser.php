@@ -4,8 +4,8 @@ namespace console\components\site_parsers;
 use GuzzleHttp\Client; // подключаем Guzzle
 
  class Parser{
-  //  const PATH = '/home/vkarpenko/work_data/project/healthlifemag/parsed';
-    const PATH = '/home/vlad/work_data/healthlifemag/tmp';
+    const PATH = '/home/vkarpenko/work_data/project/healthlifemag/parsed';
+  //  const PATH = '/home/vlad/work_data/healthlifemag/tmp';
 
    // abstract public function parseArticle($parseUrl, $url);
    // abstract protected function getDomain();
