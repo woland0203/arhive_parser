@@ -4,6 +4,13 @@ namespace console\components\translator;
 
 
 class Translator{
+    protected $tarnslator;
+
+    public function __construct()
+    {
+        $this->tarnslator = new Freeonlinetranslators();
+    }
+
     public function translateHtml($html){
         $textParts = $this->extractText($html);
         $textPartsTranslated = $this->translateParts($textParts['text']);
@@ -51,7 +58,7 @@ class Translator{
 
         print_r($textToTranslate);
         foreach ($textToTranslate as $k => &$textToTranslateItem){
-            $textToTranslate[$k] = translate($textToTranslateItem);
+            $textToTranslate[$k] = $this->tarnslator->translate($textToTranslateItem);
             $parts = preg_split('|(----------\d+-----------)|', $textToTranslate[$k], PREG_SPLIT_DELIM_CAPTURE);
            /* foreach ($parts as $part){
                 if()
