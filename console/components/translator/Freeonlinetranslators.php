@@ -52,7 +52,8 @@ class Freeonlinetranslators
     }
 
     protected function clearText($text){
-        $text = str_replace('"', '', $text);
+        $text = preg_replace('|[^\d\sa-zA-Zа-яА-Я\.\,\-#%\(\)@\?!_]+|u', '', $text);
+        return $text;
     }
 
     protected function extractText($html){

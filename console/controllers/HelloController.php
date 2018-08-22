@@ -66,6 +66,12 @@ class HelloController extends Controller
 
     public function actionTranslate(){
         $Translator = new \console\components\translator\Translator();
-        $Translator->translateHtml( file_get_contents('/home/vkarpenko/tmp/tmp2/tt.html') );
+        $HtmlProcessor = new \console\components\translator\HtmlProcessor();
+
+        $html = $Translator->translateHtml( file_get_contents('/home/vlad/tmp/t.html') );
+
+      //  $html = file_get_contents('/home/vlad/tmp/t.html');
+        $html = $HtmlProcessor->process($html);
+        file_put_contents('/home/vlad/tmp/c.html', $html);
     }
 }

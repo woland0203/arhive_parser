@@ -14,7 +14,7 @@ class Translator{
     public function translateHtml($html){
         $textParts = $this->extractText($html);
         $textPartsTranslated = $this->translateParts($textParts['text']);
-        echo $this->compileHtml($textParts['html'], $textPartsTranslated);
+        return $this->compileHtml($textParts['html'], $textPartsTranslated);
     }
 
     protected function extractText($html){
@@ -49,23 +49,32 @@ class Translator{
             }
             $textToTranslate[$j] .= $textElement . PHP_EOL . '----------' . $i . '-----------' . PHP_EOL;
 
-            if($len > 20){
+            if($len > 3000){
                 $len = 0;
                 $j++;
             }
-            //$translated[$i] = 'Translates ' .$i;
         }
 
-        print_r($textToTranslate);
         foreach ($textToTranslate as $k => &$textToTranslateItem){
             $textToTranslate[$k] = $this->tarnslator->translate($textToTranslateItem);
-            $parts = preg_split('|(----------\d+-----------)|', $textToTranslate[$k], PREG_SPLIT_DELIM_CAPTURE);
-           /* foreach ($parts as $part){
-                if()
-            }*/
-        }
 
-        die();
+            $parts = preg_split('|(----------\d+-----------)|', $textToTranslate[$k], -1, PREG_SPLIT_DELIM_CAPTURE);
+
+            $key = null; $val = null;
+            foreach ($parts as $part){
+                if(preg_match('|----------(\d+)-----------|', $part, $match)){
+                    $key = $match[1];
+                }
+                else{
+                    $val = $part;
+                }
+                if($key && $val){
+                    $translated[$key] = $val;
+                    $key = null; $val = null;
+                }
+            }
+        }
+     //   print_r($translated);
         return $translated;
     }
 
