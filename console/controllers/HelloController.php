@@ -7,6 +7,7 @@ use console\components\site_parsers\Parser;
 use console\components\file_parsers\ArchiveTxt;
 use console\components\file_parsers\ArchiveUrl;
 use console\components\loader\WpLoader;
+use yii\db\Exception;
 
 class HelloController extends Controller
 {
@@ -41,7 +42,15 @@ class HelloController extends Controller
                try {
                     $parsers[$archiveUrl->parserClass]->parseArticle($archiveUrl->parseUrl, $archiveUrl->url);
                 }catch (\Exception $exception){
-                        echo ' Parser Error(404)' . PHP_EOL;
+                      //  echo ' Parser Error(404)' . PHP_EOL;
+                        //throw new Exception('404((', 40000);
+
+                       if($exception->getCode() != 40000){
+                            throw new Exception($exception->getMessage(), $exception->getCode());
+                       }
+                       else{
+                           echo ' Parser Error(404)' . PHP_EOL;
+                       }
                    }
                // break;
             }

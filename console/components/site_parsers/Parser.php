@@ -1,7 +1,8 @@
 <?php
 namespace console\components\site_parsers;
 
-use GuzzleHttp\Client; // подключаем Guzzle
+use GuzzleHttp\Client;
+use yii\db\Exception; // подключаем Guzzle
 
  class Parser{
   //  const PATH = '/home/vkarpenko/work_data/project/healthlifemag/parsed';
@@ -56,13 +57,18 @@ use GuzzleHttp\Client; // подключаем Guzzle
         }
 
         $client = new Client();
+try{
+    $res =$client->request('GET', $parseUrl, [
+        'headers' => [
+            'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36',
+            'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        ]
+    ]);
+}
+catch (\Exception $e){
+    throw new \Exception('404((', 40000);
+}
 
-        $res =$client->request('GET', $parseUrl, [
-            'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36',
-                'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            ]
-        ]);
 
         //$res = $client->request('GET', $parseUrl);
         $body = $res->getBody();
