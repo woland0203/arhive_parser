@@ -45,6 +45,7 @@ class ArchiveTxt{
         $data = file($path);
         $r = [];
         foreach ($data as $row){
+            //print_r($row);
             $row = trim($row);
             $url = preg_split('|/web/\d+/|', $row);
             $url[1] = trim($url[1]);
