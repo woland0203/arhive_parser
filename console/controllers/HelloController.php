@@ -64,7 +64,30 @@ class HelloController extends Controller
         $loader->loadFromFolder('/home/vlad/Загрузки/add_this/tt');
     }
 
+    public function actionParse($url = 'https://doc.ua/bolezn/kandidoz/simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza'){
+        $path = '/home/vkarpenko/work_data/project/healthlifemag/parsed';
+        $host = parse_url($url, PHP_URL_HOST);        ;
+
+        $queue = new \console\components\parser\Queue($path . $host . '.db');
+
+        $parser = new \console\components\parser\sites\DocUa($queue, $path);
+        $queue->addLinks(['https://doc.ua/bolezn/kandidoz/simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza']);
+
+        while ( ($queueElement = $queue->get()) ){
+            $links = $parser->parse($queueElement->url);
+            if(!empty($links)){
+                $queueElement->markParsed();
+                $queue->addLinks($links);
+            }
+            if(!(rand(1,4)%1)){ //25% sleep
+                sleep(2);
+            }
+            unset($queueElement);
+        }
+    }
+
     public function actionTranslate(){
+
         $Translator = new \console\components\translator\Translator();
         $HtmlProcessor = new \console\components\translator\HtmlProcessor();
 
