@@ -12,6 +12,7 @@ namespace console\components\parser;
 class QueueElement
 {
     public $url;
+
     public function markParsed(){
 
     }

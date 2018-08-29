@@ -29,41 +29,43 @@ abstract class Parser{
     protected function extractLincks($url, $dom){
         $links = [];
         $domain =  $this->getDomain($url);
+        $hrefScheme = parse_url($url, PHP_URL_SCHEME);
         foreach( $dom->find('a') as $link){
             $href = $link->getAttribute('href');
             if(!empty($href)){
                 $hrefDomain =  $this->getDomain($href);
                 if(empty($hrefDomain)){
                     $hrefPath = trim( parse_url($href, PHP_URL_PATH), '/');
-                    $hrefScheme = parse_url($href, PHP_URL_SCHEME);
                     $hrefQuery = parse_url($href, PHP_URL_QUERY);
                     $hrefQuery = !empty($hrefQuery) ? ('?' . $hrefQuery) : '';
-                    $links[] = $hrefScheme . '://' . $hrefDomain . '/' . $hrefPath . $hrefQuery;
+                    $link = $hrefScheme . '://' . $domain . '/' . $hrefPath . $hrefQuery;
+                    $links[$link] = $link;
                 }
                 if($hrefDomain == $domain){
-                    $links[] = $href;
+                    $links[$href] = $href;
                 }
             }
         }
+        $this->filterUrl($links);
         return $links;
     }
 
     abstract protected function isArticle($dom);
+    abstract protected function filterUrl(&$links = []);
 
 
      protected function getDomain($url){
         return parse_url($url, PHP_URL_HOST);
     }
 
-    public function parseArticle($body){
-        $document = \phpQuery::newDocumentHTML($body);
+    public function parseArticle($document){
+
         $title = $this->findTitle($document);
         $title = $this->replace($title);
 
         echo $title . PHP_EOL;
 
         $content = $this->findContent($document);
-
         $content = $this->replace($content);
         return [
             'title' => $title,
@@ -96,7 +98,7 @@ abstract class Parser{
             ]);
         }
         catch (\Exception $e){
-            throw new \Exception('404((', 40000);
+            throw new \Exception('404((', 404);
         }
         $body = $res->getBody();
         return $body;
@@ -124,7 +126,7 @@ abstract class Parser{
     }
 
     public function getDstPath($url){
-        $dir =  static::PATH . '/' .$this->getDomain($url);
+        $dir =  $this->savePath . '/' .$this->getDomain($url);
         if(!is_dir($dir)){
             mkdir($dir);
         }
@@ -133,7 +135,7 @@ abstract class Parser{
             mkdir($dir);
         }
         $query = parse_url($url, PHP_URL_QUERY);
-        $srcPath = $dir . '/' .  str_replace('/', '_', parse_url($url, PHP_URL_PATH)) .
+        return $dir . '/' .  str_replace('/', '_', parse_url($url, PHP_URL_PATH)) .
             ($query ? ('?'.$query) : '') .
             '.html';
     }
@@ -149,6 +151,6 @@ abstract class Parser{
             $pq = pq($elem);
             $pq->remove();
         }
-        return $activeObjects;
+        return $body->html();
     }
 }

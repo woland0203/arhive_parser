@@ -65,36 +65,69 @@ class HelloController extends Controller
     }
 
     public function actionParse($url = 'https://doc.ua/bolezn/kandidoz/simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza'){
-        $path = '/home/vkarpenko/work_data/project/healthlifemag/parsed';
+        $path = '/home/vlad/work_data/healthlifemag/parsed';
         $host = parse_url($url, PHP_URL_HOST);        ;
 
-        $queue = new \console\components\parser\Queue($path . $host . '.db');
+        $queue = new \console\components\parser\Queue($path . DIRECTORY_SEPARATOR . $host . '.csv');
 
-        $parser = new \console\components\parser\sites\DocUa($queue, $path);
-        $queue->addLinks(['https://doc.ua/bolezn/kandidoz/simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza']);
+        $parser = new \console\components\parser\sites\DocUa($path);
+        $queue->addLinks([$url]);
 
-        while ( ($queueElement = $queue->get()) ){
-            $links = $parser->parse($queueElement->url);
+        while ( ($queueUrl = $queue->get()) ){
+            if(strpos($queueUrl, 'bolezn') === false){
+                continue;
+            }
+
+            try {
+                echo $queueUrl . PHP_EOL;
+                $links = $parser->parse($queueUrl);
+            }catch (\Exception $exception){
+                if($exception->getCode() != 404){
+                    throw new Exception($exception->getMessage(), $exception->getCode());
+                }
+                else{
+                    echo ' Parser Error(404): ' . $queueUrl . PHP_EOL;
+                }
+                continue;
+            }
             if(!empty($links)){
-                $queueElement->markParsed();
                 $queue->addLinks($links);
             }
-            if(!(rand(1,4)%1)){ //25% sleep
+            if(!(rand(1,2)%1)){ //25% sleep
+                echo 'sleep' . PHP_EOL;
                 sleep(2);
             }
             unset($queueElement);
         }
     }
 
-    public function actionTranslate(){
+    public function actionTranslate($path = '/home/vlad/work_data/healthlifemag/parsed/doc.ua'){
 
         $Translator = new \console\components\translator\Translator();
         $HtmlProcessor = new \console\components\translator\HtmlProcessor();
 
-        $html = $Translator->translateHtml( file_get_contents('/home/vlad/tmp/t.html') );
+        $d = dir($path . DIRECTORY_SEPARATOR . 'dst');
+
+        while (false !== ($entry = $d->read())) {
+            $filePath = $d->path . DIRECTORY_SEPARATOR  . $entry;
+            $filePathTranslated = $path . DIRECTORY_SEPARATOR . 'dst_translate' . DIRECTORY_SEPARATOR . $entry;
+            echo $filePath . PHP_EOL;
+            echo $filePathTranslated . PHP_EOL ;
+            echo '---------------' . PHP_EOL ;
+            if(is_file($filePath) && !is_file($filePathTranslated)){
+
+                $html = $Translator->translateHtml( file_get_contents($filePath) );
+                $html = $HtmlProcessor->process($html);
+                file_put_contents($filePathTranslated, $html);
+die();
+            }
+        }
+        $d->close();
+
+
 
       //  $html = file_get_contents('/home/vlad/tmp/t.html');
-        $html = $HtmlProcessor->process($html);
-        file_put_contents('/home/vlad/tmp/c.html', $html);
+
+
     }
 }

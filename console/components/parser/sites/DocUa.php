@@ -12,7 +12,18 @@ use console\components\parser\Parser;
 
 class DocUa extends Parser
 {
-    protected function isArticle($dom){
+    public $contentSelector = '.disease-content';
+    public $titleSelector = 'h1';
 
+    protected function isArticle($dom){
+        return count($dom->find('.disease-content'));
+    }
+
+    protected function filterUrl(&$links = []){
+        foreach ($links as $key => $value){
+            if(strpos($key, 'bolezn') === false){
+                unset($links[$key]);
+            }
+        }
     }
 }
