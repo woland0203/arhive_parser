@@ -132,7 +132,7 @@ class HelloController extends Controller
                 $html = $HtmlProcessor->process($html);
                 file_put_contents($filePathTranslated, $html);
                 rename($filePath, $filePathAlreadyTranslated);
-                
+
                 if(!(rand(1,10)%10)){ //25% sleep
                     echo 'sleep' . PHP_EOL;
                     sleep(2);
