@@ -80,7 +80,9 @@ class HelloController extends Controller
 
             try {
                 echo $queueUrl . PHP_EOL;
+
                 $links = $parser->parse($queueUrl);
+              //  die();
             }catch (\Exception $exception){
                 if($exception->getCode() != 404){
                     throw new Exception($exception->getMessage(), $exception->getCode());
@@ -93,11 +95,11 @@ class HelloController extends Controller
             if(!empty($links)){
                 $queue->addLinks($links);
             }
-            if(!(rand(1,2)%1)){ //25% sleep
+            if(!(rand(1,10)%10)){ //25% sleep
                 echo 'sleep' . PHP_EOL;
                 sleep(2);
             }
-            unset($queueElement);
+
         }
     }
 
@@ -106,11 +108,21 @@ class HelloController extends Controller
         $Translator = new \console\components\translator\Translator();
         $HtmlProcessor = new \console\components\translator\HtmlProcessor();
 
+        $filePath = $path . '/dst/_bolezn_kandidoz_simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza.html';
+        $filePathTranslated = $path . DIRECTORY_SEPARATOR . 'dst_translate' . DIRECTORY_SEPARATOR . '_bolezn_kandidoz_simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza.html';
+
+
+      /*  $html = $Translator->translateHtml( file_get_contents($filePath) );
+        $html = $HtmlProcessor->process($html);
+        file_put_contents($filePathTranslated, $html);
+        die();
+*/
         $d = dir($path . DIRECTORY_SEPARATOR . 'dst');
 
         while (false !== ($entry = $d->read())) {
             $filePath = $d->path . DIRECTORY_SEPARATOR  . $entry;
             $filePathTranslated = $path . DIRECTORY_SEPARATOR . 'dst_translate' . DIRECTORY_SEPARATOR . $entry;
+            $filePathAlreadyTranslated = $path . DIRECTORY_SEPARATOR . 'dst_already_translate' . DIRECTORY_SEPARATOR . $entry;
             echo $filePath . PHP_EOL;
             echo $filePathTranslated . PHP_EOL ;
             echo '---------------' . PHP_EOL ;
@@ -119,7 +131,13 @@ class HelloController extends Controller
                 $html = $Translator->translateHtml( file_get_contents($filePath) );
                 $html = $HtmlProcessor->process($html);
                 file_put_contents($filePathTranslated, $html);
-die();
+                rename($filePath, $filePathAlreadyTranslated);
+                
+                if(!(rand(1,10)%10)){ //25% sleep
+                    echo 'sleep' . PHP_EOL;
+                    sleep(2);
+                }
+
             }
         }
         $d->close();

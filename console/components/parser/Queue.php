@@ -55,12 +55,14 @@ class Queue
         unset($value);
 
         if($link){
-            $fp = fopen($this->resource, 'w');
+            $resourceTmp = $this->resource . '.tmp';
+            $fp = fopen($resourceTmp, 'w');
             foreach ($this->data as $key => $value) {
                 fputcsv($fp, [$key, $value], ';');
 
             }
             fclose($fp);
+            rename($resourceTmp, $this->resource);
 
             return $link;
         }

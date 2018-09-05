@@ -18,11 +18,10 @@ class Translator{
     }
 
     protected function extractText($html){
-        $document = \phpQuery::newDocumentHTML($html);
+        $document = \phpQuery::newDocumentHTML('<div>'.$html.'</div>');
         $cnt = 0;
         $text = [];
         foreach( $document->find('*')->contents() as $node){
-
             if($node->nodeType == 3){
                 if(!empty( trim($node->textContent) )){
                     $text[$cnt] = $node->textContent;
@@ -31,9 +30,13 @@ class Translator{
                 }
             }
         }
+        $html = $document->html();
+        $html = mb_substr($html, 5);
+        $html = mb_substr($html, 0, -6);
+
         return  [
             'text' => $text,
-            'html' => $document->html()
+            'html' => $html
         ];
     }
 
@@ -42,6 +45,7 @@ class Translator{
         $translated = [];
         $len = 0;
         $j = 0;
+       
         foreach ($text as $i => $textElement){
             $len += mb_strlen($textElement);
             if( !isset($textToTranslate[$j]) ) {
@@ -68,13 +72,13 @@ class Translator{
                 else{
                     $val = $part;
                 }
-                if($key && $val){
+                if(!is_null($key) && !is_null($val)){
                     $translated[$key] = $val;
                     $key = null; $val = null;
                 }
             }
         }
-     //   print_r($translated);
+
         return $translated;
     }
 

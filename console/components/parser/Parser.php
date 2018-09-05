@@ -21,9 +21,15 @@ abstract class Parser{
 
         if($this->isArticle($dom)){
             $article = $this->parseArticle($dom);
-            $this->saveDst($url, $article['title'] . PHP_EOL . PHP_EOL . '<br><br>' . PHP_EOL . $article['content']);
+
+            $this->saveDst($url, $this->prepareArticleToSave($url, $article));
         }
         return $links;
+    }
+
+    protected function prepareArticleToSave($url, $article){
+        return $article['title'] . PHP_EOL . PHP_EOL . '<br><br>' . PHP_EOL . $article['content'] . PHP_EOL .
+            '<script type="application/ld+json">{"url":"' . $url . '"}</script>';
     }
 
     protected function extractLincks($url, $dom){
@@ -46,12 +52,14 @@ abstract class Parser{
                 }
             }
         }
+
         $this->filterUrl($links);
+
         return $links;
     }
 
     abstract protected function isArticle($dom);
-    abstract protected function filterUrl(&$links = []);
+    abstract public function filterUrl(&$links = []);
 
 
      protected function getDomain($url){
@@ -87,7 +95,7 @@ abstract class Parser{
         if(file_exists($srcPath) && !$force){
             return file_get_contents($srcPath);
         }
-
+echo  PHP_EOL . 'CURL___' . PHP_EOL;
         $client = new Client();
         try{
             $res =$client->request('GET', $url, [

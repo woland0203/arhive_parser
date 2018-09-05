@@ -19,9 +19,15 @@ class DocUa extends Parser
         return count($dom->find('.disease-content'));
     }
 
-    protected function filterUrl(&$links = []){
+    public function filterUrl(&$links = []){
         foreach ($links as $key => $value){
             if(strpos($key, 'bolezn') === false){
+                unset($links[$key]);
+            }
+            if(strpos($key, 'page-') !== false){
+                unset($links[$key]);
+            }
+            if(strpos($key, 'doctor_models_Doctor_page') !== false){
                 unset($links[$key]);
             }
         }
