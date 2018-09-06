@@ -14,6 +14,10 @@ class Translator{
     public function translateHtml($html){
         $textParts = $this->extractText($html);
         $textPartsTranslated = $this->translateParts($textParts['text']);
+        if(empty($textPartsTranslated)){
+            return null;
+        }
+
         return $this->compileHtml($textParts['html'], $textPartsTranslated);
     }
 
@@ -60,6 +64,7 @@ class Translator{
         }
 
         foreach ($textToTranslate as $k => &$textToTranslateItem){
+
             $textToTranslate[$k] = $this->tarnslator->translate($textToTranslateItem);
 
             $parts = preg_split('|(----------\d+-----------)|', $textToTranslate[$k], -1, PREG_SPLIT_DELIM_CAPTURE);

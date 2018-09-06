@@ -1,12 +1,14 @@
 <?php
 namespace console\controllers;
 
+use SebastianBergmann\CodeCoverage\Report\PHP;
 use Yii;
 use yii\console\Controller;
 use console\components\site_parsers\Parser;
 use console\components\file_parsers\ArchiveTxt;
 use console\components\file_parsers\ArchiveUrl;
 use console\components\loader\WpLoader;
+use console\components\loader\PostHelper;
 use yii\db\Exception;
 
 class HelloController extends Controller
@@ -61,7 +63,11 @@ class HelloController extends Controller
 
     public function actionPost(){
         $loader = new WpLoader();
-        $loader->loadFromFolder('/home/vlad/Загрузки/add_this/tt');
+        $post = $loader->createPostFromFile('/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_kandidoz_simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza.html');
+       // print_r($post);
+        $post['content'] = PostHelper::prepareContent($post['content']);
+        echo $post['content'] ;
+         PostHelper::removeAttributes( \phpQuery::newDocumentHTML($post['content']) );
     }
 
     public function actionParse($url = 'https://doc.ua/bolezn/kandidoz/simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza'){
@@ -104,6 +110,15 @@ class HelloController extends Controller
     }
 
     public function actionTranslate($path = '/home/vlad/work_data/healthlifemag/parsed/doc.ua'){
+        /*$d = dir($path . DIRECTORY_SEPARATOR . 'dst_translate');
+        while (false !== ($entry = $d->read())) {
+            if(is_file($path . DIRECTORY_SEPARATOR . 'dst_already_translate/'.$entry)){
+                rename($path . DIRECTORY_SEPARATOR . 'dst_already_translate/'.$entry,
+                    $path . DIRECTORY_SEPARATOR . 'tt/'.$entry);
+            }
+        }
+        die();*/
+
 
         $Translator = new \console\components\translator\Translator();
         $HtmlProcessor = new \console\components\translator\HtmlProcessor();
@@ -117,6 +132,7 @@ class HelloController extends Controller
         file_put_contents($filePathTranslated, $html);
         die();
 */
+        $wrongCnt = 0;
         $d = dir($path . DIRECTORY_SEPARATOR . 'dst');
 
         while (false !== ($entry = $d->read())) {
@@ -129,6 +145,14 @@ class HelloController extends Controller
             if(is_file($filePath) && !is_file($filePathTranslated)){
 
                 $html = $Translator->translateHtml( file_get_contents($filePath) );
+                if(empty($html)){
+                    echo 'Wrong Translate' . PHP_EOL;
+                    $wrongCnt++;
+                    if($wrongCnt > 3){
+                        break;
+                    }
+                    continue;
+                }
                 $html = $HtmlProcessor->process($html);
                 file_put_contents($filePathTranslated, $html);
                 rename($filePath, $filePathAlreadyTranslated);
@@ -141,11 +165,5 @@ class HelloController extends Controller
             }
         }
         $d->close();
-
-
-
-      //  $html = file_get_contents('/home/vlad/tmp/t.html');
-
-
     }
 }
