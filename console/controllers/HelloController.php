@@ -61,13 +61,42 @@ class HelloController extends Controller
 
     }
 
-    public function actionPost(){
+    public function actionPost($count = 5, $path = '/home/vlad/work_data/healthlifemag/parsed/doc.ua'){
+
         $loader = new WpLoader();
-        $post = $loader->createPostFromFile('/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_kandidoz_simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza.html');
-       // print_r($post);
-        $post['content'] = PostHelper::prepareContent($post['content']);
-        echo $post['content'] ;
-         PostHelper::removeAttributes( \phpQuery::newDocumentHTML($post['content']) );
+
+       /* $r = $loader->getImageFromSearch('Understanding Erectile Dysfunction');
+        var_dump($r);
+        die();
+*/
+        $d = dir($path . DIRECTORY_SEPARATOR . 'dst_translate');
+        $cat = [65,61,62,66,64];
+        $catIndex = rand(0, (count($cat) - 1));
+
+        while ($count && false !== ($entry = $d->read())) {
+            $file = $path . DIRECTORY_SEPARATOR . 'dst_translate' . DIRECTORY_SEPARATOR . $entry;
+            $fileAlreadyLoaded = $path . DIRECTORY_SEPARATOR . 'dst_loaded' .  DIRECTORY_SEPARATOR .$entry;
+            if(!is_file($file)){
+               continue;
+            }
+
+            $post = $loader->createPostFromFile($file);
+            $post['content'] = PostHelper::prepareContent($post['content']);
+            $post['content'] = PostHelper::removeAttributes( \phpQuery::newDocumentHTML($post['content']) );
+
+            $post['category_id'] = 'diseases';
+            $content = strip_tags( $post['content']);
+            if(mb_strlen($content) > 2000){
+                $loader->loadPost($post);
+            }
+            else{
+               echo 'Less then 2000symbols: ';
+            }
+            echo $file . PHP_EOL;
+            rename($file, $fileAlreadyLoaded);
+            $count--;
+
+        }
     }
 
     public function actionParse($url = 'https://doc.ua/bolezn/kandidoz/simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza'){

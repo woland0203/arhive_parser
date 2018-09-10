@@ -1,39 +1,48 @@
 <?php
 namespace console\components\loader;
 
+use function GuzzleHttp\Psr7\build_query;
 use \monitorbacklinks\yii2wp\Wordpress;
 
-class WpLoader{
+class WpLoader
+{
     /**
      * @return Wordpress
      */
-    public function blog(){
+    public function blog()
+    {
         return \Yii::$app->blog;
     }
 
-    public function loadPost($post = []){
-        $this->blog()->getClient()->onError(function($error, $event) {
-           print_r($error);
+    public function loadPost($post = [])
+    {
+        $this->blog()->getClient()->onError(function ($error, $event) {
+            print_r($error);
         });
-        return $this->blog()->newPost($post['title'], mb_convert_encoding($post['content'], 'UTF-8'));
-    }
 
-    public function loadFromFolder($folder){
-        $d = dir($folder);
-        while (false !== ($entry = $d->read())) {
-            if(is_file($d->path . DIRECTORY_SEPARATOR . $entry)){
-                $post = $this->createPostFromFile($d->path . DIRECTORY_SEPARATOR . $entry);
-               if( ($added = $this->loadPost($post)) ){
-                   echo 'Added: ' . $added . PHP_EOL;
-               }
-            }
+
+        $thumbnailId = null;
+        $images = $this->prepareImages($post['content'], $post['url']);
+
+        if(empty($images)){
+            $images = $this->getImageFromSearch($post['title']);
         }
-        $d->close();
+
+        if(!empty($images)){
+            $thumbnail = current($images);
+            $thumbnailId = $thumbnail['id'];
+        }
+
+        return $this->blog()->newPost($post['title'], mb_convert_encoding($post['content'], 'UTF-8'), [
+            'post_thumbnail' => $thumbnailId,
+            'terms_names' => [ 'category' => array( $post['category_id'] ) ]
+        ]);
     }
 
-    public function createPostFromFile($file){
+    public function createPostFromFile($file)
+    {
         $content = file_get_contents($file);
-        $matces= preg_split('|\n\n|', $content);
+        $matces = preg_split('|\n\n|', $content);
         $title = $this->prepareTitle($matces[0]);
 
         unset($matces[0]);
@@ -42,10 +51,10 @@ class WpLoader{
         $url = null;
         $metaPattern = '|<script type="application\/ld\+json">(.+)<\/script>|';
         preg_match($metaPattern, $content, $matchMeta);
-        if(!empty($matchMeta) && !empty($matchMeta[1])){
+        if (!empty($matchMeta) && !empty($matchMeta[1])) {
             $metaData = json_decode($matchMeta[1], true);
-            if($metaData && !empty($metaData['url'])){
-                $url =  $metaData['url'];
+            if ($metaData && !empty($metaData['url'])) {
+                $url = $metaData['url'];
             }
         }
         $content = preg_replace($metaPattern, '', $content);
@@ -58,10 +67,80 @@ class WpLoader{
         ];
     }
 
-    public function prepareTitle($title){
+    public function prepareTitle($title)
+    {
         $title = strip_tags($title);
         $title = preg_replace('|\s+|', ' ', $title);
-        $title =preg_replace('|[^a-zA-Z\d-_\s]+|', ' ', $title);
+        $title = preg_replace('|[^a-zA-Z\d-_\s]+|', ' ', $title);
         return trim($title);
+    }
+
+    protected function prepareImages(&$content, $url)
+    {
+        $document = \phpQuery::newDocumentHTML($content);
+        $images = [];
+        foreach ($document->find('img') as $img) {
+            $src = $img->getAttribute('src');
+            $src = $this->resolveUrl($url, $src);
+
+            $image = $src = $this->loadImage($src);
+            $images[] = $image;
+            $img->setAttribute('src', $image['url']);
+        }
+        $content = $document->html();
+        return $images;
+    }
+
+    protected function resolveUrl($currentUrl, $url)
+    {
+        $first = substr($url, 0, 1);
+        if ($first == '/') {
+            return parse_url($currentUrl, PHP_URL_SCHEME) . '://' . parse_url($currentUrl, PHP_URL_HOST) . $url;
+        }
+
+        return parse_url($currentUrl, PHP_URL_SCHEME) . '://' . parse_url($currentUrl, PHP_URL_HOST) . '/' . $url;
+    }
+
+    protected function loadImage($url)
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        $pathParts = explode('/', $path);
+        $name = array_pop($pathParts);
+
+        $dstFile = \Yii::$app->params['tmpDir'] . DIRECTORY_SEPARATOR . urldecode($name);
+        $dstFile = preg_replace('|\s+|', '+', $dstFile);
+        //file_put_contents($dstFile, file_get_contents($url));
+        $queryPos = strpos($url, '?');
+        if($queryPos !== false){
+            $url = substr($url, 0, $queryPos);
+        }
+        exec('cd ' . \Yii::$app->params['tmpDir'] . ' && wget ' . $url);
+
+        echo $dstFile . PHP_EOL;
+
+        $fh = fopen($dstFile, 'r');
+        $fs = filesize($dstFile);
+        $theData = fread($fh, $fs);
+        fclose($fh);
+
+        $image = $this->blog()->uploadFile($name, mime_content_type($dstFile), $theData);
+        unlink($dstFile);
+        return $image;
+    }
+
+    public function getImageFromSearch($q){
+        $dstFile = \Yii::$app->params['tmpDir'] . DIRECTORY_SEPARATOR .  mktime(true);
+
+        exec('cd ' . \Yii::$app->params['tmpDir'] . ' && wget -O ' . $dstFile . ' https://www.bing.com/images/search?' . build_query(['q' => $q]));
+        $document = \phpQuery::newDocumentHTML(file_get_contents($dstFile));
+        foreach($document->find('.content .thumb') as $node){
+
+            $href = $node->getAttribute('href');
+            if(!empty($href)){
+                return [$this->loadImage($href)];
+            }
+        }
+        unlink($dstFile);
+        return [];
     }
 }

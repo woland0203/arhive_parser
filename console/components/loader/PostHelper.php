@@ -14,6 +14,7 @@ class PostHelper{
         $title = preg_replace('|\x0A{2,}|', PHP_EOL . PHP_EOL,$title);// \n
 
         $title = preg_replace('|<h1>[\s\S]*<\/h1>|i', '',$title);
+        $title = preg_replace("/<br><br>/", '', $title);
 
         return trim($title);
     }
@@ -39,12 +40,13 @@ class PostHelper{
                 self::removeAttribute($node, 'id');
                 self::removeAttribute($node, 'height');
                 self::removeAttribute($node, 'width');
-
-
             }
         }
+        $html = $document->html();
+        $html = preg_replace('/ class="[^"]+"/', '', $html);
+        $html = preg_replace("/ class='[^']+'/", '', $html);
 
-        return $document->html();
+        return $html;
     }
 
 
