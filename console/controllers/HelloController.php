@@ -70,8 +70,9 @@ class HelloController extends Controller
         die();
 */
         $d = dir($path . DIRECTORY_SEPARATOR . 'dst_translate');
-        $cat = [65,61,62,66,64];
-        $catIndex = rand(0, (count($cat) - 1));
+        $cat = ['diagnostics', 'health', 'remedies', 'symptoms'];
+        shuffle($cat);
+        array_push($cat, 'diseases');
 
         while ($count && false !== ($entry = $d->read())) {
             $file = $path . DIRECTORY_SEPARATOR . 'dst_translate' . DIRECTORY_SEPARATOR . $entry;
@@ -83,14 +84,21 @@ class HelloController extends Controller
             $post = $loader->createPostFromFile($file);
             $post['content'] = PostHelper::prepareContent($post['content']);
             $post['content'] = PostHelper::removeAttributes( \phpQuery::newDocumentHTML($post['content']) );
+            $post['content'] = PostHelper::createList( \phpQuery::newDocumentHTML($post['content']) );
 
-            $post['category_id'] = 'diseases';
+            if(!empty($cat)){
+                $post['category_id'] = array_pop($cat);
+            }
+            else{
+                $post['category_id'] = 'diseases';
+            }
+
             $content = strip_tags( $post['content']);
             if(mb_strlen($content) > 2000){
                 $loader->loadPost($post);
             }
             else{
-               echo 'Less then 2000symbols: ';
+               echo PHP_EOL .PHP_EOL .PHP_EOL .'--------------Less then 2000symbols: ' . PHP_EOL .PHP_EOL .PHP_EOL ;
             }
             echo $file . PHP_EOL;
             rename($file, $fileAlreadyLoaded);

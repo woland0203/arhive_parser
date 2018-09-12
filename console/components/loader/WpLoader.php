@@ -35,7 +35,13 @@ class WpLoader
 
         return $this->blog()->newPost($post['title'], mb_convert_encoding($post['content'], 'UTF-8'), [
             'post_thumbnail' => $thumbnailId,
-            'terms_names' => [ 'category' => array( $post['category_id'] ) ]
+            'terms_names' => [ 'category' => array( $post['category_id'] ) ],
+            'custom_fields' => [
+                [
+                    'key'   => 'content_featured_img',
+                    'value' => 'off'
+                ]
+            ]
         ]);
     }
 

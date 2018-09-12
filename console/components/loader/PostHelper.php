@@ -49,6 +49,26 @@ class PostHelper{
         return $html;
     }
 
+    public static function createList($document){
+        $counter = 1;
+        $list = [];
+        foreach( $document->find('h2') as $node){
+            $id = 'list_element_' . $counter;
+            $node->setAttribute('id', $id);
+
+            $list[$id] = '<li><a href="#'. $id . '">'. trim($node->textContent) . '</a></li>';
+            $counter++;
+        }
+        $html = $document->html();
+        if(!empty($list)){
+            $html =
+            '<ol class="rounded-list">' . PHP_EOL
+            . ( implode(PHP_EOL, $list) ) . PHP_EOL
+            . '</ol>' . PHP_EOL
+            . $html;
+        }
+        return $html;
+    }
 
     public function rip_tags($str, $allowable_tags = '', $strip_attrs = false, $preserve_comments = false, callable $callback = null) {
         $allowable_tags = array_map( 'strtolower', array_filter( // lowercase
