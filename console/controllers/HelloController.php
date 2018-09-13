@@ -62,9 +62,6 @@ class HelloController extends Controller
     }
 
     public function actionPost($count = 5, $path = '/home/vlad/work_data/healthlifemag/parsed/doc.ua'){
-
-        $loader = new WpLoader();
-
        /* $r = $loader->getImageFromSearch('Understanding Erectile Dysfunction');
         var_dump($r);
         die();

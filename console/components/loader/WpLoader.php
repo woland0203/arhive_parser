@@ -120,9 +120,10 @@ class WpLoader
         if($queryPos !== false){
             $url = substr($url, 0, $queryPos);
         }
-        exec('cd ' . \Yii::$app->params['tmpDir'] . ' && wget ' . $url);
+        exec('cd ' . \Yii::$app->params['tmpDir'] . ' && wget --timeout=10 --connect-timeout=10 --read-timeout=10 --tries=1 -t 1 ' . $url);
 
         echo $dstFile . PHP_EOL;
+        $dstFile = $this->resizeImage($dstFile);
 
         $fh = fopen($dstFile, 'r');
         $fs = filesize($dstFile);
@@ -135,18 +136,55 @@ class WpLoader
     }
 
     public function getImageFromSearch($q){
+        //echo 'getImageFromSearch --- ' . $q . PHP_EOL;
         $dstFile = \Yii::$app->params['tmpDir'] . DIRECTORY_SEPARATOR .  mktime(true);
+        try{
+        exec('cd ' . \Yii::$app->params['tmpDir'] . ' && wget -O ' . $dstFile . ' --timeout=10 --connect-timeout=10 --read-timeout=10 --tries=1 -t 1 https://www.bing.com/images/search?' . build_query(['q' => $q]));
 
-        exec('cd ' . \Yii::$app->params['tmpDir'] . ' && wget -O ' . $dstFile . ' https://www.bing.com/images/search?' . build_query(['q' => $q]));
-        $document = \phpQuery::newDocumentHTML(file_get_contents($dstFile));
-        foreach($document->find('.content .thumb') as $node){
+            $document = \phpQuery::newDocumentHTML(file_get_contents($dstFile));
+            foreach($document->find('.content .thumb') as $node){
 
-            $href = $node->getAttribute('href');
-            if(!empty($href)){
-                return [$this->loadImage($href)];
+                $href = $node->getAttribute('href');
+                if(!empty($href)){
+                    return [$this->loadImage($href)];
+                }
             }
         }
-        unlink($dstFile);
+        catch (\Exception $e){
+
+        }
+
+      //  unlink($dstFile);
         return [];
+    }
+
+    public function resizeImage($fn){
+        $pathParts = pathinfo($fn);
+        $target_filename_here = $pathParts['dirname'] . DIRECTORY_SEPARATOR .  $pathParts['filename'] . '.png';
+        $size = getimagesize($fn);
+        $dstSize = 600;
+
+        if($size[0] < $dstSize && $size[1] < $dstSize){
+            return $fn;
+        }
+        $ratio = $size[0]/$size[1]; // width/height
+        if( $ratio > 1) {
+            $width = $dstSize;
+            $height = $dstSize/$ratio;
+        }
+        else {
+            $width = $dstSize*$ratio;
+            $height = $dstSize;
+        }
+
+        $src = imagecreatefromstring(file_get_contents($fn));
+        $dst = imagecreatetruecolor($width,$height);
+        imagecopyresampled($dst,$src,0,0,0,0,$width,$height,$size[0],$size[1]);
+        imagedestroy($src);
+        imagepng($dst,$target_filename_here); // adjust format as needed
+        imagedestroy($dst);
+        print_r(error_get_last());
+        return $target_filename_here;
+
     }
 }
