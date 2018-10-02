@@ -1,0 +1,297 @@
+
+
+
+--------------Less then 2000symbols: 
+
+
+
+
+
+--------------Less then 2000symbols: 
+
+
+/home/vlad/work_data/healthlifemag/parsed/tmp/ParathyroidSymptomsCartoon60.gif
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_giperparatireoz.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/nailnurse1-1411AE8E81349699EDC.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_distrofiya-nogtya.html
+
+
+
+--------------Less then 2000symbols: 
+
+
+/home/vlad/work_data/healthlifemag/parsed/tmp/e2283f49404754bdfff5b0f53b9108.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_rak-bronhov.html
+
+
+
+--------------Less then 2000symbols: 
+
+
+/home/vlad/work_data/healthlifemag/parsed/tmp/VR1793UU_01_3200_3200_Nicotine-Dependence-Chart.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_nikotinovaya-zavisimost.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/kandidoz.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag header invalid in Entity, line: 6
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/projects/arhive_parser/yii-application/console/components/loader/WpLoader.php:93:
+array(13) {
+  'attachment_id' =>
+  string(4) "4784"
+  'date_created_gmt' =>
+  class stdClass#268 (3) {
+    public $scalar =>
+    string(17) "20181002T18:10:00"
+    public $xmlrpc_type =>
+    string(8) "datetime"
+    public $timestamp =>
+    int(1538503800)
+  }
+  'parent' =>
+  int(0)
+  'link' =>
+  string(65) "https://healthlifemag.com/wp-content/uploads/2018/10/kandidoz.jpg"
+  'title' =>
+  string(12) "kandidoz.jpg"
+  'caption' =>
+  string(0) ""
+  'description' =>
+  string(0) ""
+  'metadata' =>
+  array(5) {
+    'width' =>
+    int(600)
+    'height' =>
+    int(287)
+    'file' =>
+    string(20) "2018/10/kandidoz.jpg"
+    'sizes' =>
+    array(2) {
+      'thumbnail' =>
+      array(4) {
+        ...
+      }
+      'medium' =>
+      array(4) {
+        ...
+      }
+    }
+    'image_meta' =>
+    array(12) {
+      'aperture' =>
+      string(1) "0"
+      'credit' =>
+      string(0) ""
+      'camera' =>
+      string(0) ""
+      'caption' =>
+      string(0) ""
+      'created_timestamp' =>
+      string(1) "0"
+      'copyright' =>
+      string(0) ""
+      'focal_length' =>
+      string(1) "0"
+      'iso' =>
+      string(1) "0"
+      'shutter_speed' =>
+      string(1) "0"
+      'title' =>
+      string(0) ""
+      'orientation' =>
+      string(1) "0"
+      'keywords' =>
+      array(0) {
+        ...
+      }
+    }
+  }
+  'type' =>
+  string(9) "image/png"
+  'thumbnail' =>
+  string(73) "https://healthlifemag.com/wp-content/uploads/2018/10/kandidoz-150x150.jpg"
+  'id' =>
+  string(4) "4784"
+  'file' =>
+  string(12) "kandidoz.jpg"
+  'url' =>
+  string(65) "https://healthlifemag.com/wp-content/uploads/2018/10/kandidoz.jpg"
+}
+/home/vlad/work_data/healthlifemag/parsed/tmp/molochnica.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag header invalid in Entity, line: 6
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/projects/arhive_parser/yii-application/console/components/loader/WpLoader.php:93:
+array(13) {
+  'attachment_id' =>
+  string(4) "4785"
+  'date_created_gmt' =>
+  class stdClass#279 (3) {
+    public $scalar =>
+    string(17) "20181002T18:10:08"
+    public $xmlrpc_type =>
+    string(8) "datetime"
+    public $timestamp =>
+    int(1538503808)
+  }
+  'parent' =>
+  int(0)
+  'link' =>
+  string(67) "https://healthlifemag.com/wp-content/uploads/2018/10/molochnica.jpg"
+  'title' =>
+  string(14) "molochnica.jpg"
+  'caption' =>
+  string(0) ""
+  'description' =>
+  string(0) ""
+  'metadata' =>
+  array(5) {
+    'width' =>
+    int(600)
+    'height' =>
+    int(287)
+    'file' =>
+    string(22) "2018/10/molochnica.jpg"
+    'sizes' =>
+    array(2) {
+      'thumbnail' =>
+      array(4) {
+        ...
+      }
+      'medium' =>
+      array(4) {
+        ...
+      }
+    }
+    'image_meta' =>
+    array(12) {
+      'aperture' =>
+      string(1) "0"
+      'credit' =>
+      string(0) ""
+      'camera' =>
+      string(0) ""
+      'caption' =>
+      string(0) ""
+      'created_timestamp' =>
+      string(1) "0"
+      'copyright' =>
+      string(0) ""
+      'focal_length' =>
+      string(1) "0"
+      'iso' =>
+      string(1) "0"
+      'shutter_speed' =>
+      string(1) "0"
+      'title' =>
+      string(0) ""
+      'orientation' =>
+      string(1) "0"
+      'keywords' =>
+      array(0) {
+        ...
+      }
+    }
+  }
+  'type' =>
+  string(9) "image/png"
+  'thumbnail' =>
+  string(75) "https://healthlifemag.com/wp-content/uploads/2018/10/molochnica-150x150.jpg"
+  'id' =>
+  string(4) "4785"
+  'file' =>
+  string(14) "molochnica.jpg"
+  'url' =>
+  string(67) "https://healthlifemag.com/wp-content/uploads/2018/10/molochnica.jpg"
+}
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_kandidoz_lechenie-molochnicy-v-domashnih-usloviyah.html
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_vodyanica-disgidroz.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/how-to-treat-gout-naturally-and-safety-1-638.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_podagra_kak-lechit-podagru.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/Amyloid_fibril_formation_and_classic_facial_features_of_AL_amyloidosis.jpg
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_amiloidoz.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/205022.jpg
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_bolezn-menera.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/Lymphangitis-3.jpg
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_limfangit.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/complications-of-puerperium-1-638.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_oslozhneniya--svyazannye-s-poslerodovym-periodom.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/what-is-agnosia.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_agnoziya.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/Angioedema-Lip-Swelling.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_otek-kvinke.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/menopause-vs-andropause-infographic-560x1024.jpg
+Array
+(
+    [type] => 2
+    [message] => DOMDocument::loadHTML(): Tag footer invalid in Entity, line: 21
+    [file] => /home/vlad/projects/arhive_parser/yii-application/vendor/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php
+    [line] => 200
+)
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_andropauza.html
+/home/vlad/work_data/healthlifemag/parsed/tmp/onychomycosis_0.jpg
+/home/vlad/work_data/healthlifemag/parsed/doc.ua/dst_translate/_bolezn_gribok-nogtej-onihomikoz.html

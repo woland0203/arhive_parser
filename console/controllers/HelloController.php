@@ -61,11 +61,25 @@ class HelloController extends Controller
 
     }
 
-    public function actionPost($count = 5, $path = '/home/vlad/work_data/healthlifemag/parsed/doc.ua'){
-       /* $r = $loader->getImageFromSearch('Understanding Erectile Dysfunction');
-        var_dump($r);
-        die();
-*/
+    public function actionPost($count = 15, $path = '/home/vlad/work_data/healthlifemag/parsed/doc.ua'){
+        $shaduleFilePath = $path . '/shadule.txt';
+        $postedCount = 0;
+        if(file_exists($shaduleFilePath)){
+            $shaduleFile = json_decode(file_get_contents($path . '/shadule.txt' ), true) ;
+
+            if(date('Y-m-d') == $shaduleFile['date']){
+                $postedCount = $shaduleFile['count'];
+                $count = $count - $shaduleFile['count'];
+                if($count <= 0){
+                    echo 'Today already posted' . PHP_EOL;
+                    return;
+                }
+            }
+        }
+
+
+        $loader = new WpLoader();
+
         $d = dir($path . DIRECTORY_SEPARATOR . 'dst_translate');
         $cat = ['diagnostics', 'health', 'remedies', 'symptoms'];
         shuffle($cat);
@@ -93,15 +107,19 @@ class HelloController extends Controller
             $content = strip_tags( $post['content']);
             if(mb_strlen($content) > 2000){
                 $loader->loadPost($post);
+                echo $file . PHP_EOL;
+                rename($file, $fileAlreadyLoaded);
+                $count--;
+                $postedCount++;
             }
             else{
                echo PHP_EOL .PHP_EOL .PHP_EOL .'--------------Less then 2000symbols: ' . PHP_EOL .PHP_EOL .PHP_EOL ;
             }
-            echo $file . PHP_EOL;
-            rename($file, $fileAlreadyLoaded);
-            $count--;
+
 
         }
+        $shaduleFile = ['date' => date('Y-m-d'), 'count' => $postedCount];
+        file_put_contents($path . '/shadule.txt', json_encode($shaduleFile));
     }
 
     public function actionParse($url = 'https://doc.ua/bolezn/kandidoz/simptomy-i-lechenie-molochnicy-izbavlyaemsya-ot-kandidoza'){

@@ -90,8 +90,12 @@ class WpLoader
             $src = $this->resolveUrl($url, $src);
 
             $image = $src = $this->loadImage($src);
-            $images[] = $image;
-            $img->setAttribute('src', $image['url']);
+            var_dump($image);
+            if($image){
+                $images[] = $image;
+                $img->setAttribute('src', $image['url']);
+            }
+
         }
         $content = $document->html();
         return $images;
@@ -123,6 +127,8 @@ class WpLoader
         exec('cd ' . \Yii::$app->params['tmpDir'] . ' && wget --timeout=10 --connect-timeout=10 --read-timeout=10 --tries=1 -t 1 ' . $url);
 
         echo $dstFile . PHP_EOL;
+        if(!file_exists($dstFile)) return false;
+
         $dstFile = $this->resizeImage($dstFile);
 
         $fh = fopen($dstFile, 'r');
