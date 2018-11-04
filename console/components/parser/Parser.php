@@ -38,6 +38,7 @@ abstract class Parser{
         $hrefScheme = parse_url($url, PHP_URL_SCHEME);
         foreach( $dom->find('a') as $link){
             $href = $link->getAttribute('href');
+
             if(!empty($href)){
                 $hrefDomain =  $this->getDomain($href);
                 if(empty($hrefDomain)){
@@ -52,8 +53,9 @@ abstract class Parser{
                 }
             }
         }
-
+        print_r($links);
         $this->filterUrl($links);
+        print_r($links);
 
         return $links;
     }

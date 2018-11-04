@@ -81,9 +81,9 @@ class HelloController extends Controller
         $loader = new WpLoader();
 
         $d = dir($path . DIRECTORY_SEPARATOR . 'dst_translate');
-        $cat = ['diagnostics', 'health', 'remedies', 'symptoms'];
+        $cat = ['diagnostics', 'health', 'remedies', 'symptoms', 'remedies','health', ];
         shuffle($cat);
-        array_push($cat, 'diseases');
+      //  array_push($cat, 'diseases');
 
         while ($count && false !== ($entry = $d->read())) {
             $file = $path . DIRECTORY_SEPARATOR . 'dst_translate' . DIRECTORY_SEPARATOR . $entry;
@@ -97,15 +97,15 @@ class HelloController extends Controller
             $post['content'] = PostHelper::removeAttributes( \phpQuery::newDocumentHTML($post['content']) );
             $post['content'] = PostHelper::createList( \phpQuery::newDocumentHTML($post['content']) );
 
-            if(!empty($cat)){
-                $post['category_id'] = array_pop($cat);
-            }
-            else{
-                $post['category_id'] = 'diseases';
-            }
-
             $content = strip_tags( $post['content']);
             if(mb_strlen($content) > 2000){
+                if(!empty($cat)){
+                    $post['category_id'] = array_pop($cat);
+                }
+                else{
+                    $post['category_id'] = 'diseases';
+                }
+
                 $loader->loadPost($post);
                 echo $file . PHP_EOL;
                 rename($file, $fileAlreadyLoaded);

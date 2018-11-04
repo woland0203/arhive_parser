@@ -30,9 +30,8 @@ class WpLoader
 
         if(!empty($images)){
             $thumbnail = current($images);
-            $thumbnailId = $thumbnail['id'];
+            $thumbnailId = !empty($thumbnail['id']) ? $thumbnail['id'] : null;
         }
-
         return $this->blog()->newPost($post['title'], mb_convert_encoding($post['content'], 'UTF-8'), [
             'post_thumbnail' => $thumbnailId,
             'terms_names' => [ 'category' => array( $post['category_id'] ) ],
@@ -137,7 +136,7 @@ class WpLoader
         fclose($fh);
 
         $image = $this->blog()->uploadFile($name, mime_content_type($dstFile), $theData);
-        unlink($dstFile);
+       // unlink($dstFile);
         return $image;
     }
 
@@ -152,6 +151,7 @@ class WpLoader
 
                 $href = $node->getAttribute('href');
                 if(!empty($href)){
+                    unlink($dstFile);
                     return [$this->loadImage($href)];
                 }
             }
@@ -160,7 +160,7 @@ class WpLoader
 
         }
 
-      //  unlink($dstFile);
+        unlink($dstFile);
         return [];
     }
 
@@ -189,7 +189,7 @@ class WpLoader
         imagedestroy($src);
         imagepng($dst,$target_filename_here); // adjust format as needed
         imagedestroy($dst);
-        print_r(error_get_last());
+       // print_r(error_get_last());
         return $target_filename_here;
 
     }

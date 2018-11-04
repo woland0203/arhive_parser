@@ -17,6 +17,9 @@ class Queue
     public function __construct($resource = '')
     {
         $this->resource = $resource;
+        if(!file_exists($resource)){
+            file_put_contents($resource, '');
+        }
 
         if (($handle = fopen($resource, "r")) !== FALSE) {
             while (($data = fgetcsv($handle, 3000, ";")) !== FALSE) {
@@ -45,6 +48,7 @@ class Queue
      */
     public function get(){
         $link = null;
+        print_r($this->data);
         foreach ($this->data as $key => &$value){
             if(!$value){
                 $this->data[$key] = 1;
