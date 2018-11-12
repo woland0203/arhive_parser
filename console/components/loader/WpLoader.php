@@ -25,7 +25,7 @@ class WpLoader
         $images = $this->prepareImages($post['content'], $post['url']);
 
         if(empty($images)){
-            $images = $this->getImageFromSearch($post['title']);
+           // $images = $this->getImageFromSearch($post['title']);
         }
 
         if(!empty($images)){
@@ -54,6 +54,7 @@ class WpLoader
         $content = implode((PHP_EOL . PHP_EOL), $matces);
 
         $url = null;
+        $metaData = null;
         $metaPattern = '|<script type="application\/ld\+json">(.+)<\/script>|';
         preg_match($metaPattern, $content, $matchMeta);
         if (!empty($matchMeta) && !empty($matchMeta[1])) {
@@ -69,6 +70,7 @@ class WpLoader
             'title' => $title,
             'content' => $content,
             'url' => $url,
+            'metaData' => $metaData,
         ];
     }
 

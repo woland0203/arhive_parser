@@ -48,7 +48,7 @@ class Queue
      */
     public function get(){
         $link = null;
-        print_r($this->data);
+      //  print_r($this->data);
         foreach ($this->data as $key => &$value){
             if(!$value){
                 $this->data[$key] = 1;

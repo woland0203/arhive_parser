@@ -22,12 +22,12 @@ abstract class Parser{
         if($this->isArticle($dom)){
             $article = $this->parseArticle($dom);
 
-            $this->saveDst($url, $this->prepareArticleToSave($url, $article));
+            $this->saveDst($url, $this->prepareArticleToSave($url, $article, $dom));
         }
         return $links;
     }
 
-    protected function prepareArticleToSave($url, $article){
+    protected function prepareArticleToSave($url, $article, $dom){
         return $article['title'] . PHP_EOL . PHP_EOL . '<br><br>' . PHP_EOL . $article['content'] . PHP_EOL .
             '<script type="application/ld+json">{"url":"' . $url . '"}</script>';
     }
@@ -53,9 +53,9 @@ abstract class Parser{
                 }
             }
         }
-        print_r($links);
+      //  print_r($links);
         $this->filterUrl($links);
-        print_r($links);
+       // print_r($links);
 
         return $links;
     }
@@ -66,6 +66,10 @@ abstract class Parser{
 
      protected function getDomain($url){
         return parse_url($url, PHP_URL_HOST);
+    }
+
+    protected function prepareUrlSrcDst($url){
+        return $url;
     }
 
     public function parseArticle($document){
@@ -97,24 +101,29 @@ abstract class Parser{
         if(file_exists($srcPath) && !$force){
             return file_get_contents($srcPath);
         }
-echo  PHP_EOL . 'CURL___' . PHP_EOL;
-        $client = new Client();
+
         try{
+         $body =  CurlParser::request($url);
+/*
+        $client = new Client([ 'timeout'         =>  20, 'connect_timeout' => 10]);
+
             $res =$client->request('GET', $url, [
                 'headers' => [
                     'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36',
-                    'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+
                 ]
-            ]);
+            ]);*/
         }
         catch (\Exception $e){
+            unset($client);
             throw new \Exception('404((', 404);
         }
-        $body = $res->getBody();
+        //$body = $res->getBody();
         return $body;
     }
 
     public function getSrcPath($url){
+        $url = $this->prepareUrlSrcDst($url);
         $dir =  $this->savePath. '/' .$this->getDomain($url);
         if(!is_dir($dir)){
             mkdir($dir);
@@ -136,6 +145,7 @@ echo  PHP_EOL . 'CURL___' . PHP_EOL;
     }
 
     public function getDstPath($url){
+        $url = $this->prepareUrlSrcDst($url);
         $dir =  $this->savePath . '/' .$this->getDomain($url);
         if(!is_dir($dir)){
             mkdir($dir);
