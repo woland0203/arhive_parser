@@ -10,6 +10,8 @@ namespace console\controllers;
 
 use yii\console\Controller;
 use console\components\loader\PostHelper;
+use console\components\loader\WpLoader;
+
 
 class ArchiveController extends Controller
 {
@@ -59,7 +61,7 @@ class ArchiveController extends Controller
     }
 
 
-    public function actionPost($count = 15, $path = '/home/vlad/work_data/medicineanswersnet/parsed_archive/www.medicineanswers.net'){
+    public function actionPost($count = 1, $path = '/home/vlad/work_data/medicineanswersnet/parsed_archive/www.medicineanswers.net'){
         $shaduleFilePath = $path . '/shadule.txt';
         $postedCount = 0;
         if(file_exists($shaduleFilePath)){
@@ -75,44 +77,34 @@ class ArchiveController extends Controller
             }
         }
 
-
+        $parser = new \console\components\parser\sites_archive\MedicineanswersNet($path);
         $loader = new WpLoader();
 
-        $d = dir($path . DIRECTORY_SEPARATOR . 'dst_translate');
-        $cat = ['diagnostics', 'health', 'remedies', 'symptoms', 'remedies','health', ];
-        shuffle($cat);
-        //  array_push($cat, 'diseases');
+        $d = dir($path . DIRECTORY_SEPARATOR . 'dst');
 
         while ($count && false !== ($entry = $d->read())) {
             $file = $path . DIRECTORY_SEPARATOR . 'dst' . DIRECTORY_SEPARATOR . $entry;
+
+            //echo $file . PHP_EOL;
             $fileAlreadyLoaded = $path . DIRECTORY_SEPARATOR . 'dst_loaded' .  DIRECTORY_SEPARATOR .$entry;
             if(!is_file($file)){
                 continue;
             }
 
             $post = $loader->createPostFromFile($file);
+
             $post['content'] = PostHelper::prepareContent($post['content']);
             $post['content'] = PostHelper::removeAttributes( \phpQuery::newDocumentHTML($post['content']) );
-         //   $post['content'] = PostHelper::createList( \phpQuery::newDocumentHTML($post['content']) );
+            $post['content'] = $parser->prepareContentPost($post['content']);
+            $post['category_id'] = $parser->determinateCategory($post['metaData']);
 
-            $content = strip_tags( $post['content']);
-            if(mb_strlen($content) > 2000){
-                if(!empty($cat)){
-                    $post['category_id'] = array_pop($cat);
-                }
-                else{
-                    $post['category_id'] = 'diseases';
-                }
 
-                $loader->loadPost($post);
-                echo $file . PHP_EOL;
-                rename($file, $fileAlreadyLoaded);
-                $count--;
-                $postedCount++;
-            }
-            else{
-                echo PHP_EOL .PHP_EOL .PHP_EOL .'--------------Less then 2000symbols: ' . PHP_EOL .PHP_EOL .PHP_EOL ;
-            }
+            $loader->loadPost($post);
+            echo $file . PHP_EOL;
+            rename($file, $fileAlreadyLoaded);
+            $count--;
+            $postedCount++;
+
 
 
         }

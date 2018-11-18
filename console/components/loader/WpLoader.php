@@ -78,7 +78,7 @@ class WpLoader
     {
         $title = strip_tags($title);
         $title = preg_replace('|\s+|', ' ', $title);
-        $title = preg_replace('|[^a-zA-Z\d-_\s]+|', ' ', $title);
+        $title = preg_replace('|[^a-zA-Z\d-_\s\?]+|', ' ', $title);
         return trim($title);
     }
 

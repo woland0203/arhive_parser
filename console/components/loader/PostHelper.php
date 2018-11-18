@@ -15,7 +15,7 @@ class PostHelper{
 
         $title = preg_replace('|<h1>[\s\S]*<\/h1>|i', '',$title);
         $title = preg_replace("/<br><br>/", '', $title);
-        $title = preg_replace("/<hr>/", '', $title);
+
 
         return trim($title);
     }
