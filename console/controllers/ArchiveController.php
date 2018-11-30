@@ -15,8 +15,8 @@ use console\components\loader\WpLoader;
 
 class ArchiveController extends Controller
 {
-    public function actionParse($url = 'https://web.archive.org/web/20090217184327/http://www.medicineanswers.net:80/dental/154152.html'){
-        $path = '/home/vlad/work_data/medicineanswersnet/parsed_archive';
+    public function actionParse($url = 'https://web.archive.org/web/20101119183636/http://externalhemorrhoids.biz:80/'){
+        $path = '/home/vlad/work_data/healthlifemag/parsed/externalhemorrhoids';
 
         $urlSplit = preg_split('|/web/\d+/|', $url);
         $urlSplit[1] = trim($urlSplit[1]);
@@ -24,7 +24,7 @@ class ArchiveController extends Controller
 
         $queue = new \console\components\parser\Queue($path . DIRECTORY_SEPARATOR . $host . '.csv');
 
-        $parser = new \console\components\parser\sites_archive\MedicineanswersNet($path);
+        $parser = new \console\components\parser\sites_archive\ExternalhemorrhoidsBiz($path);
         $queue->addLinks([$url]);
 
 

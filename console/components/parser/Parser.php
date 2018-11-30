@@ -15,6 +15,7 @@ abstract class Parser{
 
     public function parse($url){
         $body = $this->parseExec($url);
+      //  echo'b ' . $body;
         $this->saveSrc($url, $body);
         $dom = \phpQuery::newDocumentHTML($body);
         $links = $this->extractLincks($url, $dom);
@@ -38,7 +39,7 @@ abstract class Parser{
         $hrefScheme = parse_url($url, PHP_URL_SCHEME);
         foreach( $dom->find('a') as $link){
             $href = $link->getAttribute('href');
-
+//echo $href . PHP_EOL;
             if(!empty($href)){
                 $hrefDomain =  $this->getDomain($href);
                 if(empty($hrefDomain)){
