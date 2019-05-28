@@ -15,7 +15,7 @@ class PostHelper{
 
         $title = preg_replace('|<h1>[\s\S]*<\/h1>|i', '',$title);
         $title = preg_replace("/<br><br>/", '', $title);
-
+        $title = nl2br($title);
 
         return trim($title);
     }
@@ -48,6 +48,16 @@ class PostHelper{
         $html = preg_replace("/ class='[^']+'/", '', $html);
 
         return $html;
+    }
+
+
+    public static function clearAHref($document){
+        foreach( $document->find('a') as $node){
+            $node = pq($node);
+            $text = $node->html();
+            $node->replaceWith($text);
+        }
+        return $document->html();
     }
 
     public static function createList($document){

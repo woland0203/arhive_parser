@@ -19,30 +19,39 @@ class WpLoader
         $this->blog()->getClient()->onError(function ($error, $event) {
             print_r($error);
         });
-
-
-        $thumbnailId = null;
-        $images = $this->prepareImages($post['content'], $post['url']);
-
-        if(empty($images)){
+        $thumbnailId = !empty($post['thumbnail_id']) ? $post['thumbnail_id'] : null;
+       // if(empty($images)){
            // $images = $this->getImageFromSearch($post['title']);
+        //}
+        $post = $this->prepareImages($post);
+
+       /* if(!empty($post['images'])){
+            $thumbnail = current($post['images']);
+            $thumbnailId = !empty($thumbnail['attachment_id']) ? $thumbnail['attachment_id'] : null;
+        }*/
+        if(!empty( $post['category_id'])){
+            $categories = array( $post['category_id'] );
         }
 
-        if(!empty($images)){
-            $thumbnail = current($images);
-            $thumbnailId = !empty($thumbnail['id']) ? $thumbnail['id'] : null;
+        if(!empty( $post['categories'])){
+            $categories =  array_unique( array_values($post['categories']) );
         }
-        return $this->blog()->newPost($post['title'], mb_convert_encoding($post['content'], 'UTF-8'), [
+        $content = [
             'post_thumbnail' => $thumbnailId,
-            'terms_names' => [ 'category' => array( $post['category_id'] ) ],
-            'custom_fields' => [
+            /*'custom_fields' => [
                 [
                     'key'   => 'content_featured_img',
                     'value' => 'off'
                 ]
-            ]
-        ]);
+            ]*/
+        ];
+        if(!empty($categories)){
+            $content['terms_names'] = [ 'category' => $categories];
+        }
+
+        return $this->blog()->newPost($post['title'], mb_convert_encoding($post['content'], 'UTF-8'), $content);
     }
+
 
     public function createPostFromFile($file)
     {
@@ -82,16 +91,31 @@ class WpLoader
         return trim($title);
     }
 
-    protected function prepareImages(&$content, $url)
+    public function prepareImages($post)
     {
+        $content = $post['content'];
+        $url = $post['url'];
+
         $document = \phpQuery::newDocumentHTML($content);
         $images = [];
         foreach ($document->find('img') as $img) {
+
             $src = $img->getAttribute('src');
+            $srcLazy = $img->getAttribute('data-lazy-src');
+
+            echo PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL . 'WITH_IMG1 ' . $src ;
+            echo PHP_EOL  . 'WITH_IMG2 ' . $srcLazy .  PHP_EOL . PHP_EOL . PHP_EOL;
+
+            $src = !$srcLazy ? $src : $srcLazy;
+
+            $srcData = $img->getAttribute('data-src');
+            $src = !$srcData ? $src : $srcData;
+
             $src = $this->resolveUrl($url, $src);
 
+
             $image = $src = $this->loadImage($src);
-            var_dump($image);
+
             if($image){
                 $images[] = $image;
                 $img->setAttribute('src', $image['url']);
@@ -99,46 +123,143 @@ class WpLoader
 
         }
         $content = $document->html();
-        return $images;
+        $post['images'] = $images;
+        $post['content'] = $content;
+
+        return $post;
     }
 
-    protected function resolveUrl($currentUrl, $url)
+    public function resolveUrl($currentUrl, $url)
     {
-        $first = substr($url, 0, 1);
-        if ($first == '/') {
-            return parse_url($currentUrl, PHP_URL_SCHEME) . '://' . parse_url($currentUrl, PHP_URL_HOST) . $url;
+        $returnUrl = parse_url($currentUrl, PHP_URL_SCHEME) . '://' . parse_url($currentUrl, PHP_URL_HOST) . '/' . $url;
+        $firstProt = substr($url, 0, 2);
+        if ($firstProt == '//') {
+            $returnUrl =  parse_url($currentUrl, PHP_URL_SCHEME) . ':' . $url;
         }
 
-        return parse_url($currentUrl, PHP_URL_SCHEME) . '://' . parse_url($currentUrl, PHP_URL_HOST) . '/' . $url;
+        $first = substr($url, 0, 1);
+        if ($first == '/') {
+            $returnUrl =  parse_url($currentUrl, PHP_URL_SCHEME) . '://' . parse_url($currentUrl, PHP_URL_HOST) . $url;
+        }
+        $firstProt = substr($url, 0, 4);
+        if ($firstProt == 'http') {
+            $returnUrl =  $url;
+        }
+        //echo '$returnUrl ' . $returnUrl . PHP_EOL;
+        $returnUrl = preg_replace('|\s|', '+', $returnUrl);
+        //echo '$returnUrl ' . $returnUrl . PHP_EOL;
+       // die();
+        return $returnUrl;
     }
 
-    protected function loadImage($url)
+    public function loadImage($url)
     {
+        try{
+            return $this->loadImageWithQ($url);
+        } catch (\Exception $e){
+            return;
+        }
+
+
+        echo 'ImgUrl:' . $url . PHP_EOL;
         $path = parse_url($url, PHP_URL_PATH);
         $pathParts = explode('/', $path);
         $name = array_pop($pathParts);
 
-        $dstFile = \Yii::$app->params['tmpDir'] . DIRECTORY_SEPARATOR . urldecode($name);
+        //if(!e)
+        $pathPartsStr = implode('_',$pathParts);
+        $pathPartsStr = !empty($pathPartsStr) ? (DIRECTORY_SEPARATOR . $pathPartsStr) : '';
+
+        $dstPath = \Yii::$app->params['tmpDir'] . $pathPartsStr;
+        if(!is_dir($dstPath)) mkdir($dstPath);
+
+        $dstFile = $dstPath . DIRECTORY_SEPARATOR . urldecode($name);
         $dstFile = preg_replace('|\s+|', '+', $dstFile);
         //file_put_contents($dstFile, file_get_contents($url));
         $queryPos = strpos($url, '?');
         if($queryPos !== false){
             $url = substr($url, 0, $queryPos);
         }
-        exec('cd ' . \Yii::$app->params['tmpDir'] . ' && wget --timeout=10 --connect-timeout=10 --read-timeout=10 --tries=1 -t 1 ' . $url);
+        echo '$dstFile: ' . $dstFile . PHP_EOL;
+        //  echo 'cd ' . $dstPath . ' && wget --timeout=10 --connect-timeout=10 --read-timeout=10 --tries=1 -t 1 ' . $url . PHP_EOL;
 
-        echo $dstFile . PHP_EOL;
+        exec('cd ' . $dstPath . ' && wget --timeout=10 --connect-timeout=10 --read-timeout=10 --tries=1 -t 1 ' . $url);
+
+
         if(!file_exists($dstFile)) return false;
 
-        $dstFile = $this->resizeImage($dstFile);
+        //   $dstFile = $this->resizeImage($dstFile);
 
         $fh = fopen($dstFile, 'r');
         $fs = filesize($dstFile);
         $theData = fread($fh, $fs);
         fclose($fh);
 
+        $this->blog()->getClient()->onError(function ($error, $event) {
+            print_r($error);
+        });
+
         $image = $this->blog()->uploadFile($name, mime_content_type($dstFile), $theData);
-       // unlink($dstFile);
+        //print_r($image);
+
+        // unlink($dstFile);
+        //  unlink($dstPath);
+
+        return $image;
+    }
+
+
+    public function loadImageWithQ($url)
+    {
+        echo 'ImgUrl:' . $url . PHP_EOL;
+        $path = parse_url($url, PHP_URL_PATH);
+        $pathParts = explode('/', $path);
+        $name = array_pop($pathParts);
+
+        $urlQuery = parse_url($url, PHP_URL_QUERY);
+        if(!empty($urlQuery)){
+            $name = urldecode($name) . '?'. preg_replace('|/|', '%2F', $urlQuery);
+        }
+
+        //if(!e)
+        $pathPartsStr = implode('_',$pathParts);
+        $pathPartsStr = !empty($pathPartsStr) ? (DIRECTORY_SEPARATOR . $pathPartsStr) : '';
+
+        $dstPath = \Yii::$app->params['tmpDir'] . $pathPartsStr;
+        if(!is_dir($dstPath)) mkdir($dstPath);
+
+        $dstFile = $dstPath . DIRECTORY_SEPARATOR . $name;
+        $dstFile = preg_replace('|\s+|', '+', $dstFile);
+        //file_put_contents($dstFile, file_get_contents($url));
+        $queryPos = strpos($url, '?');
+        if($queryPos !== false){
+            //   $url = substr($url, 0, $queryPos);
+        }
+        echo '$dstFile: ' . $dstFile . PHP_EOL;
+        echo 'cd ' . $dstPath . ' && wget --timeout=10 --connect-timeout=10 --read-timeout=10 --tries=1 -t 1 ' . $url . PHP_EOL;
+
+        exec('cd ' . $dstPath . ' && wget --timeout=10 --connect-timeout=10 --read-timeout=10 --tries=1 -t 1 ' . $url);
+
+
+        if(!file_exists($dstFile)) return false;
+
+        //   $dstFile = $this->resizeImage($dstFile);
+
+        $fh = fopen($dstFile, 'r');
+        $fs = filesize($dstFile);
+        $theData = fread($fh, $fs);
+        fclose($fh);
+
+        $this->blog()->getClient()->onError(function ($error, $event) {
+            print_r($error);
+        });
+
+        $image = $this->blog()->uploadFile($name, mime_content_type($dstFile), $theData);
+        //       var_dump($image);
+///die();
+        // unlink($dstFile);
+        //  unlink($dstPath);
+
         return $image;
     }
 

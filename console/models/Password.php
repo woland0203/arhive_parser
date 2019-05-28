@@ -21,7 +21,7 @@ class Password extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'password';
+        return 'pas_tmp';
     }
 
     /**

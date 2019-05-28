@@ -7,6 +7,7 @@ use yii\db\Exception; // подключаем Guzzle
 abstract class Parser{
 
     protected $savePath;
+    protected $currentUrl;
 
     public function __construct($savePath)
     {
@@ -14,6 +15,8 @@ abstract class Parser{
     }
 
     public function parse($url){
+        $this->currentUrl = $url;
+        $url = $this->clearSharp($url);
         $body = $this->parseExec($url);
       //  echo'b ' . $body;
         $this->saveSrc($url, $body);
@@ -34,6 +37,7 @@ abstract class Parser{
     }
 
     protected function extractLincks($url, $dom){
+        echo $url . PHP_EOL;
         $links = [];
         $domain =  $this->getDomain($url);
         $hrefScheme = parse_url($url, PHP_URL_SCHEME);
@@ -43,22 +47,60 @@ abstract class Parser{
             if(!empty($href)){
                 $hrefDomain =  $this->getDomain($href);
                 if(empty($hrefDomain)){
-                    $hrefPath = trim( parse_url($href, PHP_URL_PATH), '/');
-                    $hrefQuery = parse_url($href, PHP_URL_QUERY);
-                    $hrefQuery = !empty($hrefQuery) ? ('?' . $hrefQuery) : '';
-                    $link = $hrefScheme . '://' . $domain . '/' . $hrefPath . $hrefQuery;
-                    $links[$link] = $link;
+
+                    $link = $this->rel2abs($href, $url);
+
+
+                    $links[$link] = $this->clearSharp($link);
                 }
                 if($hrefDomain == $domain){
-                    $links[$href] = $href;
+                    $links[$href] = $this->clearSharp($href);
                 }
             }
         }
       //  print_r($links);
+        //die();
         $this->filterUrl($links);
        // print_r($links);
 
         return $links;
+    }
+
+    public function clearSharp($url){
+        $sharpPos = strpos($url, '#');
+        if($sharpPos !== false){
+            $url = substr($url, 0, $sharpPos);
+        }
+        return $url;
+    }
+
+    public function rel2abs($rel, $base)
+    {
+        /* return if already absolute URL */
+        if (parse_url($rel, PHP_URL_SCHEME) != '' || substr($rel, 0, 2) == '//') return $rel;
+
+        /* queries and anchors */
+        if ($rel[0]=='#' || $rel[0]=='?') return $base.$rel;
+
+        /* parse base URL and convert to local variables:
+         $scheme, $host, $path */
+        extract(parse_url($base));
+
+        /* remove non-directory element from path */
+        $path = preg_replace('#/[^/]*$#', '', $path);
+
+        /* destroy path if relative url points to root */
+        if ($rel[0] == '/') $path = '';
+
+        /* dirty absolute URL */
+        $abs = "$host$path/$rel";
+
+        /* replace '//' or '/./' or '/foo/../' with '/' */
+        $re = array('#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#');
+        for($n=1; $n>0; $abs=preg_replace($re, '/', $abs, -1, $n)) {}
+
+        /* absolute URL is ready! */
+        return $scheme.'://'.$abs;
     }
 
     abstract protected function isArticle($dom);

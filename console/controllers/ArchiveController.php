@@ -15,6 +15,15 @@ use console\components\loader\WpLoader;
 
 class ArchiveController extends Controller
 {
+    /**
+     * @param string $url
+     *
+     * Спарсить
+     * https://web.archive.org/web/20100402050220/http://seekhealthanswers.com:80/category/hypertension
+     * https://web.archive.org/web/20090615134444/http://www.hemorrhoidanswers.com:80/causes-of-hemorrhoids.html
+     * https://web.archive.org/web/20130823164651/http://dentalhealthanswers.com/dental-hygiene-products/
+     * https://web.archive.org/web/20031030223227/http://www.answers-health.com:80/answers-health/cankersores.html
+     */
     public function actionParse($url = 'https://web.archive.org/web/20101119183636/http://externalhemorrhoids.biz:80/'){
         $path = '/home/vlad/work_data/healthlifemag/parsed/externalhemorrhoids';
 

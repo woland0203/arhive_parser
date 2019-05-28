@@ -38,24 +38,24 @@ class SiteRepository extends Model
     public function setAccessesAttributes(Site &$site){
 
         if(!$site->login_id){
-            $login = Login::find()->orderBy('weight, id')->limit(1)->one();
+            $login = Login::find()->orderBy('id')->limit(1)->one();
             $site->setAttribute('login_id', $login->id);
         }
 
         if(!$site->password_id){
-            $password = Password::find()->orderBy('weight, id')->limit(1)->one();
+            $password = Password::find()->orderBy('id')->limit(1)->one();
             $site->setAttribute('password_id', $password->id);
         }
 
-        $password = Password::find()->where('id>' .  (int)$site->password_id)->orderBy('weight, id')->limit(1)->one();
-
+        $password = Password::find()->where('id>' .  (int)$site->password_id)->orderBy('id')->limit(1)->one();
+//var_dump($password);
         if(!$password){
-            $login = Login::find()->where('id>' .  (int)$site->login_id)->orderBy('weight, id')->limit(1)->one();
+            $login = Login::find()->where('id>' .  (int)$site->login_id)->orderBy('id')->limit(1)->one();
             if(!$login){
                 return false;
             }
             $site->setAttribute('login_id', $login->id);
-            $password = Password::find()->orderBy('weight, id')->limit(1)->one();
+            $password = Password::find()->orderBy('id')->limit(1)->one();
         }
         $site->setAttribute('password_id', $password->id);
         return true;

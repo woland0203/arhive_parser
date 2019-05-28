@@ -11,6 +11,8 @@ namespace console\components\translator;
 
 class Freeonlinetranslators
 {
+    protected $proxyConfig;
+
     public function translate($text, $from = 'ru', $to = 'en'){
         $text = $this->clearText($text);
         $html = $this->get($text, $from, $to);
@@ -19,26 +21,12 @@ class Freeonlinetranslators
 
     protected function get($text, $from, $to)
     {
-        $ch = curl_init('http://ru.freeonlinetranslators.net/');
+        $ch = curl_init('http://de.freeonlinetranslators.net/');
       //  curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         //curl_setopt($ch, CURLOPT_COOKIE, http_build_query($_COOKIE, null, ';'));
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36');
-        /*
-         curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
-         -H 'Connection: keep-alive'
-        -H 'Pragma: no-cache'
-        -H 'Cache-Control: no-cache'
-        -H 'Origin: http://ru.freeonlinetranslators.net'
-        -H 'Upgrade-Insecure-Requests: 1'
-        -H 'Content-Type: application/x-www-form-urlencoded'
-        -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36'
-        */
-          //          -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
-        /*-H 'Referer: http://ru.freeonlinetranslators.net/'
-        -H 'Accept-Encoding: gzip, deflate'
-        -H 'Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,uk;q=0.6'
-        */
+
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
             'input' => $text,
@@ -46,6 +34,23 @@ class Freeonlinetranslators
             'to' => $to,
             'result' => ''
         ]));
+
+        if($this->proxyConfig){
+            print_r($this->proxyConfig);
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxyConfig['proxy_ip']);
+            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyConfig['proxy_port']);
+
+            /*curl_setopt($ch, CURLOPT_PROXYTYPE, 7);
+            curl_setopt($ch, CURLOPT_PROXY, "http://".$this->proxyConfig['proxy_ip'].":".$this->proxyConfig['proxy_port']."/");
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+*/
+
+            /*curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
+            curl_setopt($ch, CURLOPT_PROXY, "127.0.0.1:8101"); // Default privoxy port
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+*/
+        }
         $response = curl_exec($ch);
         curl_close($ch);
 
@@ -60,5 +65,9 @@ class Freeonlinetranslators
     protected function extractText($html){
         $document = \phpQuery::newDocumentHTML($html);
         return $document->find('.translationTextarea')->eq(1)->val();
+    }
+
+    public function setProxy($proxyConfig){
+        $this->proxyConfig = $proxyConfig;
     }
 }

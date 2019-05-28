@@ -32,9 +32,9 @@ return [
         ],
         'blog' => [
             'class' => '\monitorbacklinks\yii2wp\Wordpress',
-            'endpoint' => 'https://healthlifemag.com/xmlrpc.php',
-            'username' => 'healthy',
-            'password' => 'guiTRUSt9-11'
+            'endpoint' => 'http://myboatshrinkwrapping.loc/xmlrpc.php',
+            'username' => 'adminBo',
+            'password' => 'VnMacT6CY5HauSz3OP'
         ]
     ],
     'params' => $params,

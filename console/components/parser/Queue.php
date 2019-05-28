@@ -52,6 +52,7 @@ class Queue
         foreach ($this->data as $key => &$value){
             if(!$value){
                 $this->data[$key] = 1;
+
                 $link = $key;
                 break;
             }
